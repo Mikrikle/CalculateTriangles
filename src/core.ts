@@ -14,35 +14,35 @@ export class Triangle {
   constructor(public p1: Point, public p2: Point, public p3: Point) {}
 }
 
-export function isPointsEqual(a: Point, b: Point): boolean {
-  return Math.abs(a.x - b.x) <= 0.001 && Math.abs(a.y - b.y) <= 0.001;
+export function isPointsEqual(a: Point, b: Point, alpha: number = 1): boolean {
+  return Math.abs(a.x - b.x) <= alpha && Math.abs(a.y - b.y) <= alpha;
 }
 
-export function isLinesEqual(a: Line, b: Line): boolean {
+export function isLinesEqual(a: Line, b: Line, alpha: number = 1): boolean {
   return (
-    (isPointsEqual(a.start, b.start) && isPointsEqual(a.end, b.end)) ||
-    (isPointsEqual(a.end, b.start) && isPointsEqual(a.start, b.end))
+    (isPointsEqual(a.start, b.start, alpha) && isPointsEqual(a.end, b.end, alpha)) ||
+    (isPointsEqual(a.end, b.start, alpha) && isPointsEqual(a.start, b.end, alpha))
   );
 }
 
-export function isTrianglesEqual(a: Triangle, b: Triangle): boolean {
+export function isTrianglesEqual(a: Triangle, b: Triangle, alpha: number = 1): boolean {
   let equals = 0;
   equals +=
-    isPointsEqual(a.p1, b.p1) ||
-    isPointsEqual(a.p1, b.p2) ||
-    isPointsEqual(a.p1, b.p3)
+    isPointsEqual(a.p1, b.p1, alpha) ||
+    isPointsEqual(a.p1, b.p2, alpha) ||
+    isPointsEqual(a.p1, b.p3, alpha)
       ? 1
       : 0;
   equals +=
-    isPointsEqual(a.p2, b.p1) ||
-    isPointsEqual(a.p2, b.p2) ||
-    isPointsEqual(a.p2, b.p3)
+    isPointsEqual(a.p2, b.p1, alpha) ||
+    isPointsEqual(a.p2, b.p2, alpha) ||
+    isPointsEqual(a.p2, b.p3, alpha)
       ? 1
       : 0;
   equals +=
-    isPointsEqual(a.p3, b.p1) ||
-    isPointsEqual(a.p3, b.p2) ||
-    isPointsEqual(a.p3, b.p3)
+    isPointsEqual(a.p3, b.p1, alpha) ||
+    isPointsEqual(a.p3, b.p2, alpha) ||
+    isPointsEqual(a.p3, b.p3, alpha)
       ? 1
       : 0;
   return equals === 3;
