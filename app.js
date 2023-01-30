@@ -20,7 +20,7 @@ class Triangle {
         this.p3 = p3;
     }
 }
-class DrawingServiceConfig {
+class TriangleCanvasConfig {
     constructor(color, lineWidth, pointSize, anchorRadius, canvasId, canvasClearBtnId) {
         this.color = color;
         this.lineWidth = lineWidth;
@@ -30,7 +30,7 @@ class DrawingServiceConfig {
         this.canvasClearBtnId = canvasClearBtnId;
     }
 }
-class DrawingService {
+class TriangleCanvas {
     constructor(config) {
         this.config = config;
         this.lines = [];
@@ -130,5 +130,5 @@ class DrawingService {
             ?.addEventListener("click", this.clearEventHandler);
     }
 }
-new DrawingService(new DrawingServiceConfig("black", 2, 4, 30, "canvas", "clear"));
+new TriangleCanvas(new TriangleCanvasConfig("black", 2, 4, 30, "canvas", "clear"));
 //# sourceMappingURL=app.js.map
