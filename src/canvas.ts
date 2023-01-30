@@ -1,20 +1,6 @@
-class Point {
-  constructor(public x: number, public y: number) {}
+import { Point, Line, Triangle } from "./core";
 
-  public clone(): Point {
-    return new Point(this.x, this.y);
-  }
-}
-
-class Line {
-  constructor(public start: Point, public end: Point) {}
-}
-
-class Triangle {
-  constructor(public p1: Point, public p2: Point, public p3: Point) {}
-}
-
-class TriangleCanvasConfig {
+export class TriangleCanvasConfig {
   constructor(
     public color: string,
     public lineWidth: number,
@@ -25,7 +11,7 @@ class TriangleCanvasConfig {
   ) {}
 }
 
-class TriangleCanvas {
+export class TriangleCanvas {
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
@@ -66,7 +52,11 @@ class TriangleCanvas {
     this.mousePos.y = e.clientY - rect.top;
   }
 
-  private anchorPointToPoint(point: Point, lines: Line[], radius: number): boolean {
+  private anchorPointToPoint(
+    point: Point,
+    lines: Line[],
+    radius: number
+  ): boolean {
     let minPoint: Point | null = null;
     let minDist: number = Number.MAX_SAFE_INTEGER;
     for (let line of lines) {
@@ -124,9 +114,11 @@ class TriangleCanvas {
     canvas.addEventListener("pointercancel", () => {}, false);
     canvas.addEventListener("pointermove", this.pointermoveEventHandler, false);
 
-    document
-      .getElementById(this.config.canvasClearBtnId)
-      ?.addEventListener("click", this.clearEventHandler);
+    if (this.config.canvasClearBtnId != null) {
+      document
+        .getElementById(this.config.canvasClearBtnId)
+        ?.addEventListener("click", this.clearEventHandler);
+    }
   }
 
   private clearEventHandler = () => {
@@ -152,7 +144,11 @@ class TriangleCanvas {
   private pointerupEventHandler = (e: PointerEvent) => {
     if (this.selectedPoint == null) return;
 
-    this.anchorPointToPoint(this.mousePos, this.lines, this.config.anchorRadius);
+    this.anchorPointToPoint(
+      this.mousePos,
+      this.lines,
+      this.config.anchorRadius
+    );
     this.lines.push(
       new Line(this.selectedPoint.clone(), this.mousePos.clone())
     );
@@ -160,7 +156,3 @@ class TriangleCanvas {
     this.selectedPoint = null;
   };
 }
-
-new TriangleCanvas(
-  new TriangleCanvasConfig("black", 2, 4, 30, "canvas", "clear")
-);

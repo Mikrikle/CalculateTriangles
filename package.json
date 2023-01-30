@@ -1,0 +1,13 @@
+{
+  "name": "calculatetriangles",
+  "version": "0.1.0",
+  "description": "Application for counting the number of triangles",
+  "author": "Mikrikle",
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.2",
+    "webpack-cli": "^5.0.1"
+  }
+}
