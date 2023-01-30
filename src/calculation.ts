@@ -110,8 +110,7 @@ function linesToTriangle(l1: Line, l2: Line, l3: Line): Triangle | null {
   if (a > b + c || b > a + c || c > a + b) return null;
   const p = (a + b + c) / 2;
   let S = (p * (p - a) * (p - b) * (p - c)) ** 0.5;
-  if (Math.abs(S) <= 0.01) return null;
-
+  if (isNaN(S) || Math.abs(S) <= 1) return null;
   return new Triangle(hpoints[0], hpoints[1], hpoints[2]);
 }
 
