@@ -19,6 +19,7 @@ class DrawingServiceConfig {
     public color: string,
     public lineWidth: number,
     public pointSize: number,
+    public anchorRadius: number,
     public canvasId: string,
     public canvasClearBtnId: string | null
   ) {}
@@ -63,6 +64,37 @@ class DrawingService {
     const rect = this.canvasElement.getBoundingClientRect();
     this.mousePos.x = e.clientX - rect.left;
     this.mousePos.y = e.clientY - rect.top;
+  }
+
+  private anchorPointToPoint(point: Point, lines: Line[], radius: number): boolean {
+    let minPoint: Point | null = null;
+    let minDist: number = Number.MAX_SAFE_INTEGER;
+    for (let line of lines) {
+      let distStart = Math.sqrt(
+        (point.x - line.start.x) ** 2 + (point.y - line.start.y) ** 2
+      );
+
+      let distEnd = Math.sqrt(
+        (point.x - line.end.x) ** 2 + (point.y - line.end.y) ** 2
+      );
+
+      if (Math.min(distStart, distEnd) < minDist) {
+        minPoint = distStart < distEnd ? line.start : line.end;
+        minDist = Math.min(distStart, distEnd);
+      }
+    }
+    if (minPoint != null && minDist <= radius) {
+      point.x = minPoint.x;
+      point.y = minPoint.y;
+      return true;
+    }
+    return false;
+  }
+
+  private calculateSelectedPoint() {
+    let point = new Point(this.mousePos.x, this.mousePos.y);
+    this.anchorPointToPoint(point, this.lines, this.config.anchorRadius);
+    this.selectedPoint = point.clone();
   }
 
   private clearCanvas() {
@@ -114,11 +146,13 @@ class DrawingService {
 
   private pointerdownEventHandler = (e: PointerEvent) => {
     this.updateMousePos(e);
-    this.selectedPoint = new Point(this.mousePos.x, this.mousePos.y);
+    this.calculateSelectedPoint();
   };
 
   private pointerupEventHandler = (e: PointerEvent) => {
     if (this.selectedPoint == null) return;
+
+    this.anchorPointToPoint(this.mousePos, this.lines, this.config.anchorRadius);
     this.lines.push(
       new Line(this.selectedPoint.clone(), this.mousePos.clone())
     );
@@ -127,4 +161,6 @@ class DrawingService {
   };
 }
 
-new DrawingService(new DrawingServiceConfig("black", 2, 4, "canvas", "clear"));
+new DrawingService(
+  new DrawingServiceConfig("black", 2, 4, 30, "canvas", "clear")
+);

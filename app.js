@@ -21,10 +21,11 @@ class Triangle {
     }
 }
 class DrawingServiceConfig {
-    constructor(color, lineWidth, pointSize, canvasId, canvasClearBtnId) {
+    constructor(color, lineWidth, pointSize, anchorRadius, canvasId, canvasClearBtnId) {
         this.color = color;
         this.lineWidth = lineWidth;
         this.pointSize = pointSize;
+        this.anchorRadius = anchorRadius;
         this.canvasId = canvasId;
         this.canvasClearBtnId = canvasClearBtnId;
     }
@@ -48,11 +49,12 @@ class DrawingService {
         };
         this.pointerdownEventHandler = (e) => {
             this.updateMousePos(e);
-            this.selectedPoint = new Point(this.mousePos.x, this.mousePos.y);
+            this.calculateSelectedPoint();
         };
         this.pointerupEventHandler = (e) => {
             if (this.selectedPoint == null)
                 return;
+            this.anchorPointToPoint(this.mousePos, this.lines, this.config.anchorRadius);
             this.lines.push(new Line(this.selectedPoint.clone(), this.mousePos.clone()));
             this.redraw();
             this.selectedPoint = null;
@@ -82,6 +84,29 @@ class DrawingService {
         this.mousePos.x = e.clientX - rect.left;
         this.mousePos.y = e.clientY - rect.top;
     }
+    anchorPointToPoint(point, lines, radius) {
+        let minPoint = null;
+        let minDist = Number.MAX_SAFE_INTEGER;
+        for (let line of lines) {
+            let distStart = Math.sqrt((point.x - line.start.x) ** 2 + (point.y - line.start.y) ** 2);
+            let distEnd = Math.sqrt((point.x - line.end.x) ** 2 + (point.y - line.end.y) ** 2);
+            if (Math.min(distStart, distEnd) < minDist) {
+                minPoint = distStart < distEnd ? line.start : line.end;
+                minDist = Math.min(distStart, distEnd);
+            }
+        }
+        if (minPoint != null && minDist <= radius) {
+            point.x = minPoint.x;
+            point.y = minPoint.y;
+            return true;
+        }
+        return false;
+    }
+    calculateSelectedPoint() {
+        let point = new Point(this.mousePos.x, this.mousePos.y);
+        this.anchorPointToPoint(point, this.lines, this.config.anchorRadius);
+        this.selectedPoint = point.clone();
+    }
     clearCanvas() {
         this.ctx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
     }
@@ -105,5 +130,5 @@ class DrawingService {
             ?.addEventListener("click", this.clearEventHandler);
     }
 }
-new DrawingService(new DrawingServiceConfig("black", 2, 4, "canvas", "clear"));
+new DrawingService(new DrawingServiceConfig("black", 2, 4, 30, "canvas", "clear"));
 //# sourceMappingURL=app.js.map
