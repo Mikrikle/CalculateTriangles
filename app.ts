@@ -14,7 +14,7 @@ class Triangle {
   constructor(public p1: Point, public p2: Point, public p3: Point) {}
 }
 
-class DrawingServiceConfig {
+class TriangleCanvasConfig {
   constructor(
     public color: string,
     public lineWidth: number,
@@ -25,7 +25,7 @@ class DrawingServiceConfig {
   ) {}
 }
 
-class DrawingService {
+class TriangleCanvas {
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
@@ -34,7 +34,7 @@ class DrawingService {
   mousePos: Point = new Point(0, 0);
   selectedPoint: Point | null;
 
-  constructor(public config: DrawingServiceConfig) {
+  constructor(public config: TriangleCanvasConfig) {
     this.canvasElement = document.getElementById(
       config.canvasId
     ) as HTMLCanvasElement;
@@ -161,6 +161,6 @@ class DrawingService {
   };
 }
 
-new DrawingService(
-  new DrawingServiceConfig("black", 2, 4, 30, "canvas", "clear")
+new TriangleCanvas(
+  new TriangleCanvasConfig("black", 2, 4, 30, "canvas", "clear")
 );
