@@ -18,6 +18,7 @@ class DrawingServiceConfig {
   constructor(
     public color: string,
     public lineWidth: number,
+    public pointSize: number,
     public canvasId: string,
     public canvasClearBtnId: string | null
   ) {}
@@ -37,12 +38,25 @@ class DrawingService {
       config.canvasId
     ) as HTMLCanvasElement;
     this.ctx = this.canvasElement.getContext("2d") as CanvasRenderingContext2D;
-    this.ctx.lineCap = "round";
-    this.ctx.lineJoin = "round";
-    this.ctx.strokeStyle = "black";
-    this.ctx.lineWidth = 1;
-
     this.runUserEvents();
+  }
+
+  private drawLine(from: Point, to: Point) {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = this.config.color;
+    this.ctx.lineWidth = this.config.lineWidth;
+    this.ctx.moveTo(from.x, from.y);
+    this.ctx.lineTo(to.x, to.y);
+    this.ctx.stroke();
+    this.ctx.closePath();
+  }
+
+  private drawPoint(point: Point) {
+    this.ctx.beginPath();
+    let size = this.config.pointSize;
+    this.ctx.fillRect(point.x - size / 2, point.y - size / 2, size, size);
+    this.ctx.stroke();
+    this.ctx.closePath();
   }
 
   private updateMousePos(e: PointerEvent) {
@@ -62,13 +76,11 @@ class DrawingService {
 
   private redraw() {
     for (let line of this.lines) {
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = this.config.color;
-      this.ctx.lineWidth = this.config.lineWidth;
-      this.ctx.moveTo(line.start.x, line.start.y);
-      this.ctx.lineTo(line.end.x, line.end.y);
-      this.ctx.stroke();
-      this.ctx.beginPath();
+      this.drawLine(line.start, line.end);
+    }
+    for (let line of this.lines) {
+      this.drawPoint(line.start);
+      this.drawPoint(line.end);
     }
   }
 
@@ -96,13 +108,7 @@ class DrawingService {
     this.redraw();
 
     if (this.selectedPoint != null) {
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = this.config.color;
-      this.ctx.lineWidth = this.config.lineWidth;
-      this.ctx.moveTo(this.selectedPoint.x, this.selectedPoint.y);
-      this.ctx.lineTo(this.mousePos.x, this.mousePos.y);
-      this.ctx.stroke();
-      this.ctx.beginPath();
+      this.drawLine(this.selectedPoint, this.mousePos);
     }
   };
 
@@ -121,4 +127,4 @@ class DrawingService {
   };
 }
 
-new DrawingService(new DrawingServiceConfig("black", 2, "canvas", "clear"));
+new DrawingService(new DrawingServiceConfig("black", 2, 4, "canvas", "clear"));

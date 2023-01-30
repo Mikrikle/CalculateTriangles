@@ -21,9 +21,10 @@ class Triangle {
     }
 }
 class DrawingServiceConfig {
-    constructor(color, lineWidth, canvasId, canvasClearBtnId) {
+    constructor(color, lineWidth, pointSize, canvasId, canvasClearBtnId) {
         this.color = color;
         this.lineWidth = lineWidth;
+        this.pointSize = pointSize;
         this.canvasId = canvasId;
         this.canvasClearBtnId = canvasClearBtnId;
     }
@@ -42,13 +43,7 @@ class DrawingService {
             this.clearCanvas();
             this.redraw();
             if (this.selectedPoint != null) {
-                this.ctx.beginPath();
-                this.ctx.strokeStyle = this.config.color;
-                this.ctx.lineWidth = this.config.lineWidth;
-                this.ctx.moveTo(this.selectedPoint.x, this.selectedPoint.y);
-                this.ctx.lineTo(this.mousePos.x, this.mousePos.y);
-                this.ctx.stroke();
-                this.ctx.beginPath();
+                this.drawLine(this.selectedPoint, this.mousePos);
             }
         };
         this.pointerdownEventHandler = (e) => {
@@ -64,11 +59,23 @@ class DrawingService {
         };
         this.canvasElement = document.getElementById(config.canvasId);
         this.ctx = this.canvasElement.getContext("2d");
-        this.ctx.lineCap = "round";
-        this.ctx.lineJoin = "round";
-        this.ctx.strokeStyle = "black";
-        this.ctx.lineWidth = 1;
         this.runUserEvents();
+    }
+    drawLine(from, to) {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = this.config.color;
+        this.ctx.lineWidth = this.config.lineWidth;
+        this.ctx.moveTo(from.x, from.y);
+        this.ctx.lineTo(to.x, to.y);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+    drawPoint(point) {
+        this.ctx.beginPath();
+        let size = this.config.pointSize;
+        this.ctx.fillRect(point.x - size / 2, point.y - size / 2, size, size);
+        this.ctx.stroke();
+        this.ctx.closePath();
     }
     updateMousePos(e) {
         const rect = this.canvasElement.getBoundingClientRect();
@@ -80,13 +87,11 @@ class DrawingService {
     }
     redraw() {
         for (let line of this.lines) {
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = this.config.color;
-            this.ctx.lineWidth = this.config.lineWidth;
-            this.ctx.moveTo(line.start.x, line.start.y);
-            this.ctx.lineTo(line.end.x, line.end.y);
-            this.ctx.stroke();
-            this.ctx.beginPath();
+            this.drawLine(line.start, line.end);
+        }
+        for (let line of this.lines) {
+            this.drawPoint(line.start);
+            this.drawPoint(line.end);
         }
     }
     runUserEvents() {
@@ -100,5 +105,5 @@ class DrawingService {
             ?.addEventListener("click", this.clearEventHandler);
     }
 }
-new DrawingService(new DrawingServiceConfig("black", 2, "canvas", "clear"));
+new DrawingService(new DrawingServiceConfig("black", 2, 4, "canvas", "clear"));
 //# sourceMappingURL=app.js.map
