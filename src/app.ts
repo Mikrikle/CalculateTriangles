@@ -51,23 +51,22 @@ document.getElementById("btn-prev")?.addEventListener("click", () => {
   if (showTriangleIndex > 0) showTriangleIndex--;
   trianglecanvas.clearCanvas();
   trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red");
+  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
 });
 document.getElementById("btn-next")?.addEventListener("click", () => {
   if (showTriangleIndex < calculator.triangles.length - 1) showTriangleIndex++;
   trianglecanvas.clearCanvas();
   trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red");
+  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
 });
 
 document.getElementById("calc")?.addEventListener("click", () => {
-  console.log(calculator);
   calculator.calc(canvas.lines);
   connectionsCanvas.drawLines(calculator.connections);
   connectionsCanvas.drawPoints(calculator.points, "red");
 
   trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red");
+  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
 
   (
     document.getElementById("triangles-count") as HTMLSpanElement | null
