@@ -66,6 +66,7 @@ export class InputTriangleCanvas extends TriangleCanvas {
   }
 
   private redraw() {
+    this.clearCanvas();
     for (let line of this.lines) {
       this.drawLine(line.start, line.end);
     }
@@ -110,7 +111,7 @@ export class InputTriangleCanvas extends TriangleCanvas {
     this.lines.push(
       new Line(this.selectedPoint.clone(), this.mousePos.clone())
     );
-    this.redraw();
     this.selectedPoint = null;
+    this.redraw();
   };
 }
