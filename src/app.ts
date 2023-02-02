@@ -21,6 +21,8 @@ let canvas = new InputTriangleCanvas(
     pointSize: 4,
     canvasId: "canvas",
     anchorRadius: 30,
+    useGrid: true,
+    gridCellSize: 50
   })
 );
 
