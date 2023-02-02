@@ -5,10 +5,16 @@ export class ColorGenerator {
 }
 
 export class TriangleCanvasConfig {
-  public color: string | CanvasGradient | CanvasPattern | ColorGenerator = "#000000";
+  public color: string | CanvasGradient | CanvasPattern | ColorGenerator =
+    "#000000";
   public lineWidth: number = 3;
   public pointSize: number = 5;
   public canvasId: string = "canvas";
+
+  public useGrid: boolean = false;
+  public gridColor: string = "#505050";
+  public gridLineWidth: number = 1;
+  public gridCellSize: number = 10;
 
   public constructor(init?: Partial<TriangleCanvasConfig>) {
     Object.assign(this, init);
@@ -41,6 +47,31 @@ export class TriangleCanvas {
     this.ctx = this.canvasElement.getContext("2d", {
       willReadFrequently: true,
     }) as CanvasRenderingContext2D;
+  }
+
+  public drawGrid(
+    color: string = this.config.gridColor,
+    width: number = this.config.gridLineWidth,
+    cellSize: number = this.config.gridCellSize
+  ) {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = color;
+    this.ctx.lineWidth = width;
+
+    let cols = this.canvasElement.width / cellSize;
+    let rows = this.canvasElement.height / cellSize;
+    for (let col = 0; col <= cols; col++) {
+      let newX = Math.floor(col * cellSize) + width;
+      this.ctx.moveTo(newX, 0);
+      this.ctx.lineTo(newX, this.canvasElement.height);
+    }
+    for (let row = 0; row <= rows; row++) {
+      let newY = Math.floor(row * cellSize) + width;
+      this.ctx.moveTo(0, newY);
+      this.ctx.lineTo(this.canvasElement.width, newY);
+    }
+
+    this.ctx.stroke();
   }
 
   public drawLine(

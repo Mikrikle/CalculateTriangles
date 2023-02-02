@@ -65,6 +65,8 @@ export class InputTriangleCanvas extends TriangleCanvas {
 
   private redraw() {
     this.clearCanvas();
+    if(this.config.useGrid)
+      this.drawGrid();
     for (let line of this.lines) {
       this.drawLine(line.start, line.end);
     }
