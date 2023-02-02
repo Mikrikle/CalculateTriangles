@@ -2,15 +2,13 @@ import { Point, Line, Triangle, distanceBetween } from "./core";
 import { TriangleCanvas, TriangleCanvasConfig } from "./trianglecanvas";
 
 export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
-  constructor(
-    color: string | CanvasGradient | CanvasPattern,
-    lineWidth: number,
-    pointSize: number,
-    canvasId: string,
-    public anchorRadius: number
-  ) {
-    super(color, lineWidth, pointSize, canvasId);
+  public anchorRadius: number = 50;
+
+  public constructor(init?: Partial<InputTriangleCanvasConfig>) {
+    super(init);
+    Object.assign(this, init);
   }
+
 }
 
 export class InputTriangleCanvas extends TriangleCanvas {

@@ -15,12 +15,18 @@ import {
 } from "./outputtrianglecanvas";
 
 let canvas = new InputTriangleCanvas(
-  new InputTriangleCanvasConfig("black", 2, 4, "canvas", 30)
+  new InputTriangleCanvasConfig({
+    color: "white",
+    lineWidth: 2,
+    pointSize: 4,
+    canvasId: "canvas",
+    anchorRadius: 30,
+  })
 );
 
 let connectionsCanvas = new OutputTriangleCanvas(
-  new OutputTriangleCanvasConfig(
-    new ColorGenerator(
+  new OutputTriangleCanvasConfig({
+    color: new ColorGenerator(
       () =>
         "#" +
         (
@@ -28,15 +34,20 @@ let connectionsCanvas = new OutputTriangleCanvas(
         ).slice(-6) +
         "50"
     ),
-    3,
-    8,
-    "connections"
-  )
+    lineWidth: 3,
+    pointSize: 8,
+    canvasId: "connections",
+  })
 );
 
 let showTriangleIndex = 0;
 let trianglecanvas = new OutputTriangleCanvas(
-  new OutputTriangleCanvasConfig("black", 2, 4, "triangles")
+  new OutputTriangleCanvasConfig({
+    color: "black",
+    lineWidth: 2,
+    pointSize: 4,
+    canvasId: "triangles",
+  })
 );
 
 let calculator = new TrianglesCalculator();
@@ -51,13 +62,21 @@ document.getElementById("btn-prev")?.addEventListener("click", () => {
   if (showTriangleIndex > 0) showTriangleIndex--;
   trianglecanvas.clearCanvas();
   trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
+  trianglecanvas.drawTriangle(
+    calculator.triangles[showTriangleIndex],
+    "red",
+    4
+  );
 });
 document.getElementById("btn-next")?.addEventListener("click", () => {
   if (showTriangleIndex < calculator.triangles.length - 1) showTriangleIndex++;
   trianglecanvas.clearCanvas();
   trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
+  trianglecanvas.drawTriangle(
+    calculator.triangles[showTriangleIndex],
+    "red",
+    4
+  );
 });
 
 document.getElementById("calc")?.addEventListener("click", () => {
@@ -66,7 +85,11 @@ document.getElementById("calc")?.addEventListener("click", () => {
   connectionsCanvas.drawPoints(calculator.points, "red");
 
   trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
+  trianglecanvas.drawTriangle(
+    calculator.triangles[showTriangleIndex],
+    "red",
+    4
+  );
 
   (
     document.getElementById("triangles-count") as HTMLSpanElement | null

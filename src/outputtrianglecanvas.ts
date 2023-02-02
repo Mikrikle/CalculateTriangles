@@ -6,13 +6,9 @@ import {
 } from "./trianglecanvas";
 
 export class OutputTriangleCanvasConfig extends TriangleCanvasConfig {
-  constructor(
-    color: string | CanvasGradient | CanvasPattern | ColorGenerator,
-    lineWidth: number,
-    pointSize: number,
-    canvasId: string
-  ) {
-    super(color, lineWidth, pointSize, canvasId);
+  public constructor(init?: Partial<OutputTriangleCanvasConfig>) {
+    super(init);
+    Object.assign(this, init);
   }
 }
 

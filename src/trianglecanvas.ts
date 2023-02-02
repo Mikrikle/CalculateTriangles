@@ -5,12 +5,14 @@ export class ColorGenerator {
 }
 
 export class TriangleCanvasConfig {
-  constructor(
-    public color: string | CanvasGradient | CanvasPattern | ColorGenerator,
-    public lineWidth: number,
-    public pointSize: number,
-    public canvasId: string
-  ) {}
+  public color: string | CanvasGradient | CanvasPattern | ColorGenerator = "#000000";
+  public lineWidth: number = 3;
+  public pointSize: number = 5;
+  public canvasId: string = "canvas";
+
+  public constructor(init?: Partial<TriangleCanvasConfig>) {
+    Object.assign(this, init);
+  }
 }
 
 export class TriangleCanvas {
