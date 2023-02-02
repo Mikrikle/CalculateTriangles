@@ -17,11 +17,28 @@ export class TriangleCanvas {
   canvasElement: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
+  onResize = (e: UIEvent) => {
+    let temp = this.ctx.getImageData(
+      0,
+      0,
+      this.canvasElement.width,
+      this.canvasElement.height
+    );
+    this.canvasElement.width = this.canvasElement.offsetWidth;
+    this.canvasElement.height = this.canvasElement.offsetHeight;
+    this.ctx.putImageData(temp, 0, 0);
+  };
+
   constructor(public config: TriangleCanvasConfig) {
     this.canvasElement = document.getElementById(
       config.canvasId
     ) as HTMLCanvasElement;
-    this.ctx = this.canvasElement.getContext("2d") as CanvasRenderingContext2D;
+    this.canvasElement.width = this.canvasElement.offsetWidth;
+    this.canvasElement.height = this.canvasElement.offsetHeight;
+    window.addEventListener("resize", this.onResize, false);
+    this.ctx = this.canvasElement.getContext("2d", {
+      willReadFrequently: true,
+    }) as CanvasRenderingContext2D;
   }
 
   public drawLine(
