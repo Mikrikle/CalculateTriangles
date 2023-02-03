@@ -20,7 +20,7 @@ let canvas = new InputTriangleCanvas(
     lineWidth: 2,
     pointSize: 8,
     canvasId: "canvas",
-    anchorRadius: 50,
+    mergeRadius: 25,
     useGrid: true,
     gridCellSize: 40,
     gridLineWidth: 20

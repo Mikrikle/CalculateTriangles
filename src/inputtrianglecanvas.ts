@@ -10,7 +10,7 @@ import {
 } from "./calculation";
 
 export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
-  public anchorRadius: number = 50;
+  public mergeRadius: number = 50;
 
   public constructor(init?: Partial<InputTriangleCanvasConfig>) {
     super(init);
@@ -47,7 +47,7 @@ export class InputTriangleCanvas extends TriangleCanvas {
       mergePointWithPoint(
         point,
         this.intersectionPoints,
-        this.config.anchorRadius
+        this.config.mergeRadius
       )
     )
       return true;
@@ -68,7 +68,7 @@ export class InputTriangleCanvas extends TriangleCanvas {
         startPoint.y + this.config.gridCellSize
       ),
     ];
-    if (mergePointWithPoint(point, gridPoints, this.config.anchorRadius))
+    if (mergePointWithPoint(point, gridPoints, this.config.gridCellSize))
       return true;
     return false;
   }
@@ -80,37 +80,33 @@ export class InputTriangleCanvas extends TriangleCanvas {
     }
   }
 
-  private correctMousePoint() {
+  private correctPointPos(point: Point) {
     let res = false;
-    if (!res) res = this.mergePointWithIntersectionPoints(this.mousePos);
-    if (!res)
+    if (!res) {
+      res = this.mergePointWithIntersectionPoints(point);
+    }
+    if (!res) {
       res = mergePointWithLinePoints(
-        this.mousePos,
+        point,
         this.lines,
-        this.config.anchorRadius
+        this.config.mergeRadius * 2
       );
-    if (!res)
-      res = mergePointWithLine(
-        this.mousePos,
-        this.lines,
-        this.config.anchorRadius
-      );
-    if (!res && this.config.useGrid)
-      res = this.mergePointWithGrid(this.mousePos);
+    }
+    if (!res) {
+      res = mergePointWithLine(point, this.lines, this.config.mergeRadius * 2);
+    }
+    if (!res && this.config.useGrid) {
+      res = this.mergePointWithGrid(point);
+    }
+  }
+
+  private correctMousePoint() {
+    this.correctPointPos(this.mousePos);
   }
 
   private correctSelectedPoint() {
     let point = new Point(this.mousePos.x, this.mousePos.y);
-    let res = false;
-    if (!res) res = this.mergePointWithIntersectionPoints(point);
-    if (!res) res = mergePointWithLinePoints(
-      point,
-      this.lines,
-      this.config.anchorRadius
-    );
-    if (!res)
-      res = mergePointWithLine(point, this.lines, this.config.anchorRadius);
-    if (!res && this.config.useGrid) res = this.mergePointWithGrid(point);
+    this.correctPointPos(point);
     this.selectedPoint = point.clone();
   }
 
