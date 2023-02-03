@@ -18,11 +18,12 @@ let canvas = new InputTriangleCanvas(
   new InputTriangleCanvasConfig({
     color: "white",
     lineWidth: 2,
-    pointSize: 4,
+    pointSize: 8,
     canvasId: "canvas",
     anchorRadius: 50,
     useGrid: true,
-    gridCellSize: 50
+    gridCellSize: 40,
+    gridLineWidth: 20
   })
 );
 
