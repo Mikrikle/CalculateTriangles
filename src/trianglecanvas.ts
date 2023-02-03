@@ -47,6 +47,7 @@ export class TriangleCanvas {
     this.ctx = this.canvasElement.getContext("2d", {
       willReadFrequently: true,
     }) as CanvasRenderingContext2D;
+    this.ctx.lineCap = 'round';
 
     if (this.config.useGrid) {
       this.drawGrid();
