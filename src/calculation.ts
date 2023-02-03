@@ -5,7 +5,6 @@ import {
   isPointsEqual,
   isLinesEqual,
   isTrianglesEqual,
-  distanceBetween,
 } from "./core";
 
 export class TrianglesCalculatorConfig {
@@ -103,9 +102,9 @@ function linesToTriangle(l1: Line, l2: Line, l3: Line): Triangle | null {
   );
   if (hpoints.length != 3) return null;
 
-  var a = distanceBetween(l1.start, l1.end);
-  var b = distanceBetween(l2.start, l2.end);
-  var c = distanceBetween(l3.start, l3.end);
+  var a = distanceBetweenPoints(l1.start, l1.end);
+  var b = distanceBetweenPoints(l2.start, l2.end);
+  var c = distanceBetweenPoints(l3.start, l3.end);
 
   if (a > b + c || b > a + c || c > a + b) return null;
   const p = (a + b + c) / 2;
@@ -114,7 +113,46 @@ function linesToTriangle(l1: Line, l2: Line, l3: Line): Triangle | null {
   return new Triangle(hpoints[0], hpoints[1], hpoints[2]);
 }
 
-function checkIntersection(line1: Line, line2: Line): Point | null {
+export function distanceBetweenPoints(p1: Point, p2: Point): number {
+  return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+}
+
+export function distanceFromPointToLine(
+  point: Point,
+  line: Line
+): { point: Point; distace: number } {
+  const A = point.x - line.start.x;
+  const B = point.y - line.start.y;
+  const C = line.end.x - line.start.x;
+  const D = line.end.y - line.start.y;
+
+  let dot = A * C + B * D;
+  let len_sq = C * C + D * D;
+  let param = -1;
+  if (len_sq != 0) {
+    param = dot / len_sq;
+  }
+  let xx = 0;
+  let yy = 0;
+
+  if (param < 0) {
+    xx = line.start.x;
+    yy = line.start.y;
+  } else if (param > 1) {
+    xx = line.end.x;
+    yy = line.end.y;
+  } else {
+    xx = line.start.x + param * C;
+    yy = line.start.y + param * D;
+  }
+
+  let dx = point.x - xx;
+  let dy = point.y - yy;
+
+  return { point: new Point(xx, yy), distace: Math.sqrt(dx * dx + dy * dy) };
+}
+
+export function checkIntersection(line1: Line, line2: Line): Point | null {
   let checkedPoints = [line1.start, line1.end, line2.start, line2.end];
   let A: number, B: number, C: number;
   let pointxx: number, pointyy: number;

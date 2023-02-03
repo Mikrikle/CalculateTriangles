@@ -1,4 +1,4 @@
-import { Point, Line, Triangle, distanceBetween } from "./core";
+import { Point, Line, Triangle } from "./core";
 
 export class ColorGenerator {
   constructor(public generate: () => string) {}

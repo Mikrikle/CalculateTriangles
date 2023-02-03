@@ -47,7 +47,3 @@ export function isTrianglesEqual(a: Triangle, b: Triangle, alpha: number = 1): b
       : 0;
   return equals === 3;
 }
-
-export function distanceBetween(p1: Point, p2: Point): number {
-  return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-}
