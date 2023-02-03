@@ -20,7 +20,7 @@ let canvas = new InputTriangleCanvas(
     lineWidth: 2,
     pointSize: 4,
     canvasId: "canvas",
-    anchorRadius: 30,
+    anchorRadius: 50,
     useGrid: true,
     gridCellSize: 50
   })
@@ -38,7 +38,7 @@ let connectionsCanvas = new OutputTriangleCanvas(
     ),
     lineWidth: 3,
     pointSize: 8,
-    canvasId: "connections",
+    canvasId: "connections"
   })
 );
 

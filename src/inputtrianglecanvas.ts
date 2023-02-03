@@ -1,5 +1,6 @@
-import { Point, Line, Triangle, distanceBetween } from "./core";
+import { Point, Line, Triangle } from "./core";
 import { TriangleCanvas, TriangleCanvasConfig } from "./trianglecanvas";
+import { distanceBetweenPoints, distanceFromPointToLine } from "./calculation";
 
 export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
   public anchorRadius: number = 50;
@@ -8,7 +9,6 @@ export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
     super(init);
     Object.assign(this, init);
   }
-
 }
 
 export class InputTriangleCanvas extends TriangleCanvas {
@@ -33,23 +33,19 @@ export class InputTriangleCanvas extends TriangleCanvas {
     this.mousePos.y = e.clientY - rect.top;
   }
 
-  private anchorPointToPoint(
-    point: Point,
-    lines: Line[],
-    radius: number
-  ): boolean {
+  private mergePointWithPoint(point: Point, lines: Line[]): boolean {
     let minPoint: Point | null = null;
     let minDist: number = Number.MAX_SAFE_INTEGER;
     for (let line of lines) {
-      let distStart = distanceBetween(point, line.start);
-      let distEnd = distanceBetween(point, line.end);
+      let distStart = distanceBetweenPoints(point, line.start);
+      let distEnd = distanceBetweenPoints(point, line.end);
 
       if (Math.min(distStart, distEnd) < minDist) {
         minPoint = distStart < distEnd ? line.start : line.end;
         minDist = Math.min(distStart, distEnd);
       }
     }
-    if (minPoint != null && minDist <= radius) {
+    if (minPoint != null && minDist <= this.config.anchorRadius) {
       point.x = minPoint.x;
       point.y = minPoint.y;
       return true;
@@ -57,9 +53,35 @@ export class InputTriangleCanvas extends TriangleCanvas {
     return false;
   }
 
-  private calculateSelectedPoint() {
+  private mergePointWithLine(point: Point, lines: Line[]): boolean {
+    let minPoint: Point | null = null;
+    let minDist: number = Number.MAX_SAFE_INTEGER;
+    for (let line of lines) {
+      let pd = distanceFromPointToLine(point, line);
+      if (pd.distace < minDist) {
+        minDist = pd.distace;
+        minPoint = pd.point;
+      }
+    }
+    if (minPoint != null && minDist <= this.config.anchorRadius) {
+      point.x = minPoint.x;
+      point.y = minPoint.y;
+      return true;
+    }
+    return false;
+  }
+
+  private correctMousePoint(){
+    if(!this.mergePointWithPoint(this.mousePos, this.lines)){
+      this.mergePointWithLine(this.mousePos, this.lines);
+    }
+  }
+
+  private correctSelectedPoint() {
     let point = new Point(this.mousePos.x, this.mousePos.y);
-    this.anchorPointToPoint(point, this.lines, this.config.anchorRadius);
+    if(!this.mergePointWithPoint(point, this.lines)){
+      this.mergePointWithLine(point, this.lines);
+    }
     this.selectedPoint = point.clone();
   }
 
@@ -95,17 +117,13 @@ export class InputTriangleCanvas extends TriangleCanvas {
 
   private pointerdownEventHandler = (e: PointerEvent) => {
     this.updateMousePos(e);
-    this.calculateSelectedPoint();
+    this.correctSelectedPoint();
   };
 
   private pointerupEventHandler = (e: PointerEvent) => {
     if (this.selectedPoint == null) return;
 
-    this.anchorPointToPoint(
-      this.mousePos,
-      this.lines,
-      this.config.anchorRadius
-    );
+    this.correctMousePoint();
     this.lines.push(
       new Line(this.selectedPoint.clone(), this.mousePos.clone())
     );
