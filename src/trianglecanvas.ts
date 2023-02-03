@@ -47,6 +47,10 @@ export class TriangleCanvas {
     this.ctx = this.canvasElement.getContext("2d", {
       willReadFrequently: true,
     }) as CanvasRenderingContext2D;
+
+    if (this.config.useGrid) {
+      this.drawGrid();
+    }
   }
 
   public drawGrid(
@@ -129,5 +133,8 @@ export class TriangleCanvas {
       this.canvasElement.width,
       this.canvasElement.height
     );
+    if (this.config.useGrid) {
+      this.drawGrid();
+    }
   }
 }
