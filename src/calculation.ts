@@ -113,6 +113,74 @@ function linesToTriangle(l1: Line, l2: Line, l3: Line): Triangle | null {
   return new Triangle(hpoints[0], hpoints[1], hpoints[2]);
 }
 
+export function mergePointWithPoint(
+  point: Point,
+  points: Point[],
+  raduis: number
+): boolean {
+  let minPoint: Point | null = null;
+  let minDist: number = Number.MAX_SAFE_INTEGER;
+  for (let toPoint of points) {
+    let distace = distanceBetweenPoints(point, toPoint);
+    if (distace < minDist) {
+      minDist = distace;
+      minPoint = toPoint;
+    }
+  }
+  if (minPoint != null && minDist <= raduis) {
+    point.x = minPoint.x;
+    point.y = minPoint.y;
+    return true;
+  }
+  return false;
+}
+
+export function mergePointWithLinePoints(
+  point: Point,
+  lines: Line[],
+  raduis: number
+): boolean {
+  let minPoint: Point | null = null;
+  let minDist: number = Number.MAX_SAFE_INTEGER;
+  for (let line of lines) {
+    let distStart = distanceBetweenPoints(point, line.start);
+    let distEnd = distanceBetweenPoints(point, line.end);
+
+    if (Math.min(distStart, distEnd) < minDist) {
+      minPoint = distStart < distEnd ? line.start : line.end;
+      minDist = Math.min(distStart, distEnd);
+    }
+  }
+  if (minPoint != null && minDist <= raduis) {
+    point.x = minPoint.x;
+    point.y = minPoint.y;
+    return true;
+  }
+  return false;
+}
+
+export function mergePointWithLine(
+  point: Point,
+  lines: Line[],
+  raduis: number
+): boolean {
+  let minPoint: Point | null = null;
+  let minDist: number = Number.MAX_SAFE_INTEGER;
+  for (let line of lines) {
+    let pd = distanceFromPointToLine(point, line);
+    if (pd.distace < minDist) {
+      minDist = pd.distace;
+      minPoint = pd.point;
+    }
+  }
+  if (minPoint != null && minDist <= raduis) {
+    point.x = minPoint.x;
+    point.y = minPoint.y;
+    return true;
+  }
+  return false;
+}
+
 export function distanceBetweenPoints(p1: Point, p2: Point): number {
   return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
 }

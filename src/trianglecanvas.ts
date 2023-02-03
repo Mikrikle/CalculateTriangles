@@ -14,7 +14,7 @@ export class TriangleCanvasConfig {
   public useGrid: boolean = false;
   public gridColor: string = "#505050";
   public gridLineWidth: number = 1;
-  public gridCellSize: number = 10;
+  public gridCellSize: number = 40;
 
   public constructor(init?: Partial<TriangleCanvasConfig>) {
     Object.assign(this, init);
@@ -55,24 +55,20 @@ export class TriangleCanvas {
 
   public drawGrid(
     color: string = this.config.gridColor,
-    width: number = this.config.gridLineWidth,
-    cellSize: number = this.config.gridCellSize
+    size: number = this.config.gridCellSize
   ) {
     this.ctx.beginPath();
     this.ctx.strokeStyle = color;
-    this.ctx.lineWidth = width;
+    this.ctx.lineWidth = 1;
 
-    let cols = this.canvasElement.width / cellSize;
-    let rows = this.canvasElement.height / cellSize;
-    for (let col = 0; col <= cols; col++) {
-      let newX = Math.floor(col * cellSize) + width;
-      this.ctx.moveTo(newX, 0);
-      this.ctx.lineTo(newX, this.canvasElement.height);
+    for (let x = 0; x <= this.canvasElement.width; x += size) {
+      this.ctx.moveTo(x + 0.5, 0);
+      this.ctx.lineTo(x + 0.5, this.canvasElement.height);
     }
-    for (let row = 0; row <= rows; row++) {
-      let newY = Math.floor(row * cellSize) + width;
-      this.ctx.moveTo(0, newY);
-      this.ctx.lineTo(this.canvasElement.width, newY);
+
+    for (let y = 0; y <= this.canvasElement.height; y += size) {
+      this.ctx.moveTo(0, y + 0.5);
+      this.ctx.lineTo(this.canvasElement.width, y + 0.5);
     }
 
     this.ctx.stroke();

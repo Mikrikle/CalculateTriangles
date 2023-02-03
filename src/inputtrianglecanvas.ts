@@ -1,6 +1,13 @@
 import { Point, Line, Triangle } from "./core";
 import { TriangleCanvas, TriangleCanvasConfig } from "./trianglecanvas";
-import { distanceBetweenPoints, distanceFromPointToLine } from "./calculation";
+import {
+  checkIntersection,
+  distanceBetweenPoints,
+  distanceFromPointToLine,
+  mergePointWithLine,
+  mergePointWithLinePoints,
+  mergePointWithPoint,
+} from "./calculation";
 
 export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
   public anchorRadius: number = 50;
@@ -13,6 +20,7 @@ export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
 
 export class InputTriangleCanvas extends TriangleCanvas {
   lines: Line[] = [];
+  intersectionPoints: Point[] = [];
 
   mousePos: Point = new Point(0, 0);
   selectedPoint: Point | null;
@@ -25,6 +33,7 @@ export class InputTriangleCanvas extends TriangleCanvas {
   public clearAll() {
     this.clearCanvas();
     this.lines = [];
+    this.intersectionPoints = [];
   }
 
   private updateMousePos(e: PointerEvent) {
@@ -33,55 +42,75 @@ export class InputTriangleCanvas extends TriangleCanvas {
     this.mousePos.y = e.clientY - rect.top;
   }
 
-  private mergePointWithPoint(point: Point, lines: Line[]): boolean {
-    let minPoint: Point | null = null;
-    let minDist: number = Number.MAX_SAFE_INTEGER;
-    for (let line of lines) {
-      let distStart = distanceBetweenPoints(point, line.start);
-      let distEnd = distanceBetweenPoints(point, line.end);
-
-      if (Math.min(distStart, distEnd) < minDist) {
-        minPoint = distStart < distEnd ? line.start : line.end;
-        minDist = Math.min(distStart, distEnd);
-      }
-    }
-    if (minPoint != null && minDist <= this.config.anchorRadius) {
-      point.x = minPoint.x;
-      point.y = minPoint.y;
+  private mergePointWithIntersectionPoints(point: Point): boolean {
+    if (
+      mergePointWithPoint(
+        point,
+        this.intersectionPoints,
+        this.config.anchorRadius
+      )
+    )
       return true;
-    }
     return false;
   }
 
-  private mergePointWithLine(point: Point, lines: Line[]): boolean {
-    let minPoint: Point | null = null;
-    let minDist: number = Number.MAX_SAFE_INTEGER;
-    for (let line of lines) {
-      let pd = distanceFromPointToLine(point, line);
-      if (pd.distace < minDist) {
-        minDist = pd.distace;
-        minPoint = pd.point;
-      }
-    }
-    if (minPoint != null && minDist <= this.config.anchorRadius) {
-      point.x = minPoint.x;
-      point.y = minPoint.y;
+  private mergePointWithGrid(point: Point): boolean {
+    let size = this.config.gridCellSize;
+    let cx = Math.floor(point.x / size);
+    let cy = Math.floor(point.y / size);
+    let startPoint = new Point(cx * size, cy * size);
+    let gridPoints = [
+      startPoint,
+      new Point(startPoint.x + this.config.gridCellSize, startPoint.y),
+      new Point(startPoint.x, startPoint.y + this.config.gridCellSize),
+      new Point(
+        startPoint.x + this.config.gridCellSize,
+        startPoint.y + this.config.gridCellSize
+      ),
+    ];
+    if (mergePointWithPoint(point, gridPoints, this.config.anchorRadius))
       return true;
-    }
     return false;
   }
 
-  private correctMousePoint(){
-    if(!this.mergePointWithPoint(this.mousePos, this.lines)){
-      this.mergePointWithLine(this.mousePos, this.lines);
+  private addIntersectionPoint(line: Line) {
+    for (let withLine of this.lines) {
+      let point = checkIntersection(line, withLine);
+      if (point != null) this.intersectionPoints.push(point);
     }
+  }
+
+  private correctMousePoint() {
+    let res = false;
+    if (!res) res = this.mergePointWithIntersectionPoints(this.mousePos);
+    if (!res)
+      res = mergePointWithLinePoints(
+        this.mousePos,
+        this.lines,
+        this.config.anchorRadius
+      );
+    if (!res)
+      res = mergePointWithLine(
+        this.mousePos,
+        this.lines,
+        this.config.anchorRadius
+      );
+    if (!res && this.config.useGrid)
+      res = this.mergePointWithGrid(this.mousePos);
   }
 
   private correctSelectedPoint() {
     let point = new Point(this.mousePos.x, this.mousePos.y);
-    if(!this.mergePointWithPoint(point, this.lines)){
-      this.mergePointWithLine(point, this.lines);
-    }
+    let res = false;
+    if (!res) res = this.mergePointWithIntersectionPoints(point);
+    if (!res) res = mergePointWithLinePoints(
+      point,
+      this.lines,
+      this.config.anchorRadius
+    );
+    if (!res)
+      res = mergePointWithLine(point, this.lines, this.config.anchorRadius);
+    if (!res && this.config.useGrid) res = this.mergePointWithGrid(point);
     this.selectedPoint = point.clone();
   }
 
@@ -93,6 +122,9 @@ export class InputTriangleCanvas extends TriangleCanvas {
     for (let line of this.lines) {
       this.drawPoint(line.start);
       this.drawPoint(line.end);
+    }
+    for (let point of this.intersectionPoints) {
+      this.drawPoint(point);
     }
   }
 
@@ -124,9 +156,9 @@ export class InputTriangleCanvas extends TriangleCanvas {
     if (this.selectedPoint == null) return;
 
     this.correctMousePoint();
-    this.lines.push(
-      new Line(this.selectedPoint.clone(), this.mousePos.clone())
-    );
+    let line = new Line(this.selectedPoint.clone(), this.mousePos.clone());
+    this.addIntersectionPoint(line);
+    this.lines.push(line);
     this.selectedPoint = null;
     this.redraw();
   };
