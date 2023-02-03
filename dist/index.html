@@ -4,54 +4,60 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="main.css" />
     <title>Document</title>
   </head>
   <body>
-    <div style="display: flex; justify-content: space-around">
-      <div style="display: flex">
-        <div>
-          <button id="clear">CLEAR</button>
-          <button id="calc">CALC</button>
+    <nav>
+      <div
+        style="background-color: black; height: 20px; margin-bottom: 30px"
+      ></div>
+    </nav>
+    <main>
+      <div class="col">
+        <div class="row">
+          <div class="container">
+            <h5>toolbar</h5>
+          </div>
+          <canvas
+            id="canvas"
+            class="canvas canvas-bordered canvas-drawable center"
+          >
+          </canvas>
+          <div class="container">
+            <h5>toolbar</h5>
+            <button id="clear" class="">Clear</button>
+          </div>
         </div>
-        <canvas
-          id="canvas"
-          width="300"
-          height="300"
-          style="border: 1px solid black; touch-action: none"
-        >
-        </canvas>
+        <div class="row">
+          <div id="calc" class="btn-neon-big">CALC</div>
+        </div>
       </div>
+    </main>
 
-      <div style="display: flex">
-        <ul>
-          <li>Triangles: <span id="triangles-count">0</span></li>
-          <li>Points: <span id="points-count">0</span></li>
-        </ul>
+    <hr style="margin: 10px" />
 
-        <canvas
-          id="connections"
-          width="300"
-          height="300"
-          style="border: 1px solid black"
-        >
-        </canvas>
-      </div>
+    <div class="col">
+      <ul>
+        <li>Triangles: <span id="triangles-count">0</span></li>
+        <li>Points: <span id="points-count">0</span></li>
+      </ul>
     </div>
 
-    <hr/>
+    <div class="col">
+      <canvas id="connections" class="canvas"> </canvas>
+    </div>
 
-    <div style="text-align: center;">
+    <hr style="margin: 10px" />
+
+    <div class="col">
       <div>
-        <button id="btn-prev"> previous </button>
-        <button id="btn-next"> next </button>
+        <button id="btn-prev">previous</button>
+        <button id="btn-next">next</button>
       </div>
-      <canvas
-        id="triangles"
-        width="300"
-        height="300"
-        style="border: 1px solid black"
-      ></canvas>
+      <canvas id="triangles" class="canvas"></canvas>
     </div>
+    -->
 
     <script src="app-bundle.js"></script>
   </body>
