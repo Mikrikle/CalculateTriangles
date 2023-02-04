@@ -23,7 +23,7 @@ let canvas = new InputTriangleCanvas(
     mergeRadius: 25,
     useGrid: true,
     gridCellSize: 40,
-    gridLineWidth: 20
+    gridLineWidth: 20,
   })
 );
 
@@ -39,7 +39,7 @@ let connectionsCanvas = new OutputTriangleCanvas(
     ),
     lineWidth: 3,
     pointSize: 8,
-    canvasId: "connections"
+    canvasId: "connections",
   })
 );
 
@@ -101,4 +101,11 @@ document.getElementById("calc")?.addEventListener("click", () => {
   (
     document.getElementById("points-count") as HTMLSpanElement | null
   ).textContent = String(calculator.points.length);
+});
+
+document.getElementById("redo")?.addEventListener("click", () => {
+  canvas.redo();
+});
+document.getElementById("undo")?.addEventListener("click", () => {
+  canvas.undo();
 });
