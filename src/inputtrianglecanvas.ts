@@ -18,9 +18,14 @@ export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
   }
 }
 
+class DrawAction {
+  line: Line;
+  ipoints: Point[];
+}
 export class InputTriangleCanvas extends TriangleCanvas {
   lines: Line[] = [];
-  intersectionPoints: Point[] = [];
+  intersectionPoints: [Point[]] = [[]];
+  cancelledActions: DrawAction[] = [];
 
   mousePos: Point = new Point(0, 0);
   selectedPoint: Point | null;
@@ -33,7 +38,27 @@ export class InputTriangleCanvas extends TriangleCanvas {
   public clearAll() {
     this.clearCanvas();
     this.lines = [];
-    this.intersectionPoints = [];
+    this.intersectionPoints = [[]];
+    this.cancelledActions = [];
+  }
+
+  public undo() {
+    if (this.lines.length == 0) return;
+    this.cancelledActions.push({
+      line: this.lines.pop(),
+      ipoints:
+        this.intersectionPoints.length > 0 ? this.intersectionPoints.pop() : [],
+    });
+    this.redraw();
+  }
+
+  public redo() {
+    if (this.cancelledActions.length == 0) return;
+    let savedAction = this.cancelledActions.pop();
+    this.lines.push(savedAction.line);
+    if (savedAction.ipoints.length > 0)
+      this.intersectionPoints.push(savedAction.ipoints);
+    this.redraw();
   }
 
   private updateMousePos(e: PointerEvent) {
@@ -46,7 +71,10 @@ export class InputTriangleCanvas extends TriangleCanvas {
     if (
       mergePointWithPoint(
         point,
-        this.intersectionPoints,
+        this.intersectionPoints.reduce((accum, item) => {
+          accum.push(...item);
+          return accum;
+        }, []),
         this.config.mergeRadius
       )
     )
@@ -74,9 +102,13 @@ export class InputTriangleCanvas extends TriangleCanvas {
   }
 
   private addIntersectionPoint(line: Line) {
+    let points: Point[] = [];
     for (let withLine of this.lines) {
       let point = checkIntersection(line, withLine);
-      if (point != null) this.intersectionPoints.push(point);
+      if (point != null) points.push(point);
+    }
+    if (points.length > 0) {
+      this.intersectionPoints.push(points);
     }
   }
 
@@ -119,8 +151,10 @@ export class InputTriangleCanvas extends TriangleCanvas {
       this.drawPoint(line.start);
       this.drawPoint(line.end);
     }
-    for (let point of this.intersectionPoints) {
-      this.drawPoint(point);
+    for (let ipoints of this.intersectionPoints) {
+      for (let point of ipoints) {
+        this.drawPoint(point);
+      }
     }
   }
 
