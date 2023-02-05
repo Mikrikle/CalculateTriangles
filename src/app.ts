@@ -14,6 +14,8 @@ import {
   OutputTriangleCanvasConfig,
 } from "./outputtrianglecanvas";
 
+let calculator = new TrianglesCalculator();
+
 let canvas = new InputTriangleCanvas(
   new InputTriangleCanvasConfig({
     color: "white",
@@ -27,24 +29,8 @@ let canvas = new InputTriangleCanvas(
   })
 );
 
-let connectionsCanvas = new OutputTriangleCanvas(
-  new OutputTriangleCanvasConfig({
-    color: new ColorGenerator(
-      () =>
-        "#" +
-        (
-          "00000" + Math.floor(Math.random() * Math.pow(16, 6)).toString(16)
-        ).slice(-6) +
-        "50"
-    ),
-    lineWidth: 3,
-    pointSize: 8,
-    canvasId: "connections",
-  })
-);
-
 let showTriangleIndex = 0;
-let trianglecanvas = new OutputTriangleCanvas(
+let outputCanvas = new OutputTriangleCanvas(
   new OutputTriangleCanvasConfig({
     color: "black",
     lineWidth: 2,
@@ -53,54 +39,51 @@ let trianglecanvas = new OutputTriangleCanvas(
   })
 );
 
-let calculator = new TrianglesCalculator();
+function drawOutputCanvas() {
+  outputCanvas.clearCanvas();
+  outputCanvas.drawLines(calculator.lines, "grey", 1);
+  outputCanvas.drawPoints(calculator.points, "gray", 5);
+  outputCanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
+}
+
+function drawTrianglesSelector(){
+  let s = document.getElementById("triangles-selector") as HTMLElement | null;
+  if(s){
+    s.textContent = `${showTriangleIndex + 1} / ${calculator.triangles.length}`;
+  }
+}
 
 document.getElementById("clear")?.addEventListener("click", () => {
   canvas.clearAll();
-  connectionsCanvas.clearCanvas();
-  trianglecanvas.clearCanvas();
+  outputCanvas.clearCanvas();
 });
 
 document.getElementById("btn-prev")?.addEventListener("click", () => {
   if (showTriangleIndex > 0) showTriangleIndex--;
-  trianglecanvas.clearCanvas();
-  trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(
-    calculator.triangles[showTriangleIndex],
-    "red",
-    4
-  );
+  drawOutputCanvas();
+  drawTrianglesSelector();
 });
 document.getElementById("btn-next")?.addEventListener("click", () => {
   if (showTriangleIndex < calculator.triangles.length - 1) showTriangleIndex++;
-  trianglecanvas.clearCanvas();
-  trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(
-    calculator.triangles[showTriangleIndex],
-    "red",
-    4
-  );
+  drawOutputCanvas();
+  drawTrianglesSelector();
 });
 
 document.getElementById("calc")?.addEventListener("click", () => {
+
+  let loading = document.getElementById("loading") as HTMLElement | null;
+  loading.style.display = "block";
   calculator.calc(canvas.lines);
-  connectionsCanvas.drawLines(calculator.connections);
-  connectionsCanvas.drawPoints(calculator.points, "red");
-
-  trianglecanvas.drawTriangles(calculator.triangles, "grey");
-  trianglecanvas.drawTriangle(
-    calculator.triangles[showTriangleIndex],
-    "red",
-    4
-  );
-
+  drawOutputCanvas();
   (
     document.getElementById("triangles-count") as HTMLSpanElement | null
   ).textContent = String(calculator.triangles.length);
-
-  (
-    document.getElementById("points-count") as HTMLSpanElement | null
-  ).textContent = String(calculator.points.length);
+  drawTrianglesSelector();
+  outputCanvas.canvasElement.scrollIntoView({
+    behavior: "smooth",
+    block: "end",
+  });
+  loading.style.display = "none";
 });
 
 document.getElementById("redo")?.addEventListener("click", () => {
