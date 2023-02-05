@@ -8,58 +8,52 @@
     <title>Document</title>
   </head>
   <body>
+
+    <div id="loading"></div>
+
     <nav>
       <div
-        style="background-color: black; height: 20px; margin-bottom: 30px"
+        style="background-color: black; height: 15px; margin-bottom: 5px"
       ></div>
     </nav>
     <main>
       <div class="col">
-        <div class="row">
-          <div class="container">
-            <h5>toolbar</h5>
+        <div class="container">
+          <div class="toolbar">
+            <div id="clear" class="btn-neon">Clear</div>
+            <span>
+              <div id="undo" class="btn-neon">Undo</div>
+              <div id="redo" class="btn-neon">Redo</div>
+            </span>
           </div>
           <canvas
             id="canvas"
             class="canvas canvas-bordered canvas-drawable center"
           >
           </canvas>
-          <div class="container">
-            <h5>toolbar</h5>
-            <button id="clear" style="display: block;" class="">Clear</button>
-            <button id="undo" style="display: block;" class="">Undo</button>
-            <button id="redo" style="display: block;" class="">Redo</button>
-          </div>
         </div>
-        <div class="row">
-          <div id="calc" class="btn-neon-big">CALC</div>
+        <div class="container">
+          <div id="calc" class="btn-big btn-neon">CALC</div>
         </div>
       </div>
     </main>
 
-    <hr style="margin: 10px" />
+    <hr />
 
-    <div class="col">
-      <ul>
-        <li>Triangles: <span id="triangles-count">0</span></li>
-        <li>Points: <span id="points-count">0</span></li>
-      </ul>
+    <div class="container col">
+      <h2 class="card">
+        Triangles: <span id="triangles-count">0</span>
+      </h2>
     </div>
 
-    <div class="col">
-      <canvas id="connections" class="canvas"> </canvas>
-    </div>
-
-    <hr style="margin: 10px" />
-
-    <div class="col">
-      <div>
-        <button id="btn-prev">previous</button>
-        <button id="btn-next">next</button>
+    <div class="col container">
+      <div class="row">
+        <div id="btn-prev" class="btn-wide btn-neon">previous</div>
+        <div id="triangles-selector" class="text-neon">0/0</div>
+        <div id="btn-next" class="btn-wide btn-neon">next</div>
       </div>
       <canvas id="triangles" class="canvas"></canvas>
     </div>
-    -->
 
     <script src="app-bundle.js"></script>
   </body>
