@@ -1,10 +1,3 @@
-import { Point, Line, Triangle } from "./core";
-import {
-  ColorGenerator,
-  TriangleCanvas,
-  TriangleCanvasConfig,
-} from "./trianglecanvas";
-import { TrianglesCalculator } from "./calculation";
 import {
   InputTriangleCanvas,
   InputTriangleCanvasConfig,
@@ -14,7 +7,20 @@ import {
   OutputTriangleCanvasConfig,
 } from "./outputtrianglecanvas";
 
-let calculator = new TrianglesCalculator();
+let calculator: any;
+const calculatorLoading = document.getElementById("loading") as HTMLElement | null;
+const calculateworker = new Worker(new URL("./workers/calc.worker.ts", import.meta.url));
+calculateworker.onmessage = (message) => {
+  calculator = message.data;
+
+  drawOutputCanvas();
+  drawTrianglesSelector();
+  outputCanvas.canvasElement.scrollIntoView({
+    behavior: "smooth",
+    block: "end",
+  });
+  calculatorLoading.style.visibility = "hidden";
+};
 
 let canvas = new InputTriangleCanvas(
   new InputTriangleCanvasConfig({
@@ -70,20 +76,8 @@ document.getElementById("btn-next")?.addEventListener("click", () => {
 });
 
 document.getElementById("calc")?.addEventListener("click", () => {
-
-  let loading = document.getElementById("loading") as HTMLElement | null;
-  loading.style.display = "block";
-  calculator.calc(canvas.lines);
-  drawOutputCanvas();
-  (
-    document.getElementById("triangles-count") as HTMLSpanElement | null
-  ).textContent = String(calculator.triangles.length);
-  drawTrianglesSelector();
-  outputCanvas.canvasElement.scrollIntoView({
-    behavior: "smooth",
-    block: "end",
-  });
-  loading.style.display = "none";
+  calculatorLoading.style.visibility = "visible";
+  calculateworker.postMessage(canvas.lines);
 });
 
 document.getElementById("redo")?.addEventListener("click", () => {

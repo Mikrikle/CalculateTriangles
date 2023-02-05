@@ -17,18 +17,6 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
-#loading{
-  position: fixed;
-  width: 64px;
-  height: 64px;
-  background-color: red;
-  top: 50%;
-  left: 50%;
-  margin-top: -32px;
-  margin-left: -32px;
-  display: none;
-}
-
 .container {
   padding: 5px;
   margin-top: 10px;
@@ -123,6 +111,44 @@ body {
 .canvas-drawable {
   touch-action: none;
   display: block;
+}
+
+
+#loading
+{
+  visibility: hidden;
+  position: fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:150px;
+  height:150px;
+  background:transparent;
+  border-radius:50%;
+}
+#loading:before
+{
+  content:'';
+  position:absolute;
+  top:-3px;
+  left:-3px;
+  width:100%;
+  height:100%;
+  border-top:3px solid var(--clr-neon);
+  border-right:3px solid var(--clr-neon);
+  border-radius:50%;
+  animation:animate 2s linear infinite;
+}
+@keyframes animate
+{
+  0%
+  {
+    transform:rotate(45deg);
+  }
+  100%
+  {
+    transform:rotate(405deg);
+  }
 }
 
 
