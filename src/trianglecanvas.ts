@@ -47,7 +47,7 @@ export class TriangleCanvas {
     this.ctx = this.canvasElement.getContext("2d", {
       willReadFrequently: true,
     }) as CanvasRenderingContext2D;
-    this.ctx.lineCap = 'round';
+    this.ctx.lineCap = "round";
 
     if (this.config.useGrid) {
       this.drawGrid();
@@ -82,6 +82,7 @@ export class TriangleCanvas {
       .config.color,
     lineWidth: number = this.config.lineWidth
   ) {
+    if (!from || !to) return;
     this.ctx.beginPath();
     if (color instanceof ColorGenerator)
       this.ctx.strokeStyle = color.generate();
@@ -98,6 +99,7 @@ export class TriangleCanvas {
       .config.color,
     pointSize: number = this.config.pointSize
   ) {
+    if (!point) return;
     this.ctx.beginPath();
     if (color instanceof ColorGenerator) this.ctx.fillStyle = color.generate();
     else this.ctx.fillStyle = color;
@@ -112,6 +114,7 @@ export class TriangleCanvas {
       .config.color,
     lineWidth: number = this.config.lineWidth
   ) {
+    if (!triangle) return;
     this.ctx.beginPath();
     if (color instanceof ColorGenerator) this.ctx.fillStyle = color.generate();
     else this.ctx.strokeStyle = color;
