@@ -26,8 +26,7 @@ body {
 
 .container {
   padding: 5px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 5px;
 }
 
 .col {
@@ -59,6 +58,8 @@ body {
 .toolbar {
   display: flex;
   justify-content: space-evenly;
+  width: 95vw;
+  max-width: 640px;
 }
 .toolbar .btn {
   display: inline-block;
