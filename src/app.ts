@@ -22,7 +22,7 @@ calculateworker.onmessage = (message) => {
   calculatorLoading.style.visibility = "hidden";
 };
 
-let canvas = new InputTriangleCanvas(
+const canvas = new InputTriangleCanvas(
   new InputTriangleCanvasConfig({
     color: "white",
     lineWidth: 2,
@@ -36,7 +36,8 @@ let canvas = new InputTriangleCanvas(
 );
 
 let showTriangleIndex = 0;
-let outputCanvas = new OutputTriangleCanvas(
+const trianglesSelector = document.getElementById("triangles-selector") as HTMLElement | null;
+const outputCanvas = new OutputTriangleCanvas(
   new OutputTriangleCanvasConfig({
     color: "black",
     lineWidth: 2,
@@ -53,15 +54,17 @@ function drawOutputCanvas() {
 }
 
 function drawTrianglesSelector(){
-  let s = document.getElementById("triangles-selector") as HTMLElement | null;
-  if(s){
-    s.textContent = `${showTriangleIndex + 1} / ${calculator.triangles.length}`;
+  if(trianglesSelector && calculator.triangles.length > 0){
+    trianglesSelector.textContent = `${showTriangleIndex + 1} / ${calculator.triangles.length}`;
   }
 }
 
 document.getElementById("clear")?.addEventListener("click", () => {
   canvas.clearAll();
   outputCanvas.clearCanvas();
+  if(trianglesSelector){
+    trianglesSelector.textContent = "0 / 0";
+  }
 });
 
 document.getElementById("btn-prev")?.addEventListener("click", () => {
