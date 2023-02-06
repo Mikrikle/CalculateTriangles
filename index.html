@@ -4,8 +4,10 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="favicon.ico"/>
     <link rel="stylesheet" type="text/css" href="main.css" />
-    <title>Document</title>
+    <script src="https://kit.fontawesome.com/dffea43ae6.js" crossorigin="anonymous"></script>
+    <title>Triangles</title>
   </head>
   <body>
     <div id="loading"><span></span></div>
@@ -19,11 +21,11 @@
       <div class="col">
         <div class="container">
           <div class="toolbar">
-            <div id="clear" class="btn-neon">Clear</div>
-            <span>
-              <div id="undo" class="btn-neon">Undo</div>
-              <div id="redo" class="btn-neon">Redo</div>
-            </span>
+            <div id="clear" class="btn btn-neon"><i class="fa-solid fa-arrows-rotate"></i></div>
+            <div> 
+              <div id="undo" class="btn btn-neon"><i class="fa-solid fa-arrow-left"></i></div>
+              <div id="redo" class="btn btn-neon"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
           </div>
           <canvas
             id="canvas"
@@ -32,12 +34,12 @@
           </canvas>
         </div>
         <div class="container">
-          <div id="calc" class="btn-big btn-neon">CALC</div>
+          <div id="calc" class="btn-big btn-neon"><i class="fa-solid fa-play"></i></div>
         </div>
       </div>
     </main>
 
-    <hr />
+    <hr class="split"/>
 
     <div class="container col">
       <h2 class="card">Triangles: <span id="triangles-count">0</span></h2>
@@ -45,9 +47,9 @@
 
     <div class="col container">
       <div class="row">
-        <div id="btn-prev" class="btn-wide btn-neon">previous</div>
+        <div id="btn-prev" class="btn-wide btn-neon"><i class="fa-solid fa-angle-left"></i></div>
         <div id="triangles-selector" class="text-neon">0/0</div>
-        <div id="btn-next" class="btn-wide btn-neon">next</div>
+        <div id="btn-next" class="btn-wide btn-neon"><i class="fa-solid fa-angle-right"></i></div>
       </div>
       <canvas id="triangles" class="canvas"></canvas>
     </div>
