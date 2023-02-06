@@ -8,11 +8,17 @@ import {
 } from "./outputtrianglecanvas";
 
 let calculator: any;
-const calculatorLoading = document.getElementById("loading") as HTMLElement | null;
-const calculateworker = new Worker(new URL("./workers/calc.worker.ts", import.meta.url));
+const calculatorLoading = document.getElementById(
+  "loading"
+) as HTMLElement | null;
+const calculateworker = new Worker(
+  new URL("./workers/calc.worker.ts", import.meta.url)
+);
 calculateworker.onmessage = (message) => {
   calculator = message.data;
-
+  if (trianglesCounter) {
+    trianglesCounter.textContent = calculator.triangles.length;
+  }
   drawOutputCanvas();
   drawTrianglesSelector();
   outputCanvas.canvasElement.scrollIntoView({
@@ -36,7 +42,12 @@ const canvas = new InputTriangleCanvas(
 );
 
 let showTriangleIndex = 0;
-const trianglesSelector = document.getElementById("triangles-selector") as HTMLElement | null;
+const trianglesSelector = document.getElementById(
+  "triangles-selector"
+) as HTMLElement | null;
+const trianglesCounter = document.getElementById(
+  "triangles-count"
+) as HTMLElement | null;
 const outputCanvas = new OutputTriangleCanvas(
   new OutputTriangleCanvasConfig({
     color: "black",
@@ -53,17 +64,22 @@ function drawOutputCanvas() {
   outputCanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
 }
 
-function drawTrianglesSelector(){
-  if(trianglesSelector && calculator.triangles.length > 0){
-    trianglesSelector.textContent = `${showTriangleIndex + 1} / ${calculator.triangles.length}`;
+function drawTrianglesSelector() {
+  if (trianglesSelector && calculator.triangles.length > 0) {
+    trianglesSelector.textContent = `${showTriangleIndex + 1} / ${
+      calculator.triangles.length
+    }`;
   }
 }
 
 document.getElementById("clear")?.addEventListener("click", () => {
   canvas.clearAll();
   outputCanvas.clearCanvas();
-  if(trianglesSelector){
+  if (trianglesSelector) {
     trianglesSelector.textContent = "0 / 0";
+  }
+  if (trianglesCounter) {
+    trianglesCounter.textContent = "0";
   }
 });
 
