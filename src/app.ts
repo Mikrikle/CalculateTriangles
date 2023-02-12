@@ -64,7 +64,7 @@ function drawOutputCanvas() {
     return;
   outputCanvas.drawLines(calculator.lines, "grey", 1);
   outputCanvas.drawPoints(calculator.points, "gray", 5);
-  outputCanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
+  outputCanvas.drawTriangle(calculator.triangles[showTriangleIndex], "#EB618F", 4);
 }
 
 function drawTrianglesSelector() {
