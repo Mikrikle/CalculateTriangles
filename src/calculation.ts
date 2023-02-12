@@ -1,9 +1,4 @@
-import {
-  Point,
-  Line,
-  Triangle,
-  isPointsEqual
-} from "./core";
+import { Point, Line, Triangle, isPointsEqual } from "./core";
 
 export function linesToTriangle(l1: Line, l2: Line, l3: Line): Triangle | null {
   let hpoints = [l1.start, l1.end, l2.start, l2.end, l3.start, l3.end];
@@ -131,6 +126,44 @@ export function distanceFromPointToLine(
   return { point: new Point(xx, yy), distace: Math.sqrt(dx * dx + dy * dy) };
 }
 
+export function isLinesPartsOfOneLine(line1: Line, line2: Line): Line | null {
+  if (!isLinesParallel(line1, line2)) return null;
+
+  if (isPointsEqual(line1.start, line2.start))
+    return new Line(line1.end, line2.end);
+
+  if (isPointsEqual(line1.end, line2.end))
+    return new Line(line1.start, line2.start);
+
+  if (isPointsEqual(line1.start, line2.end))
+    return new Line(line1.end, line2.start);
+
+  if (isPointsEqual(line1.end, line2.start))
+    return new Line(line1.start, line2.end);
+
+  return null;
+}
+
+export function isLinesParallel(line1: Line, line2: Line): boolean {
+  let k1 = Math.atan(
+    (line1.end.y - line1.start.y) / (line1.end.x - line1.start.x)
+  );
+  let k2 = Math.atan(
+    (line2.end.y - line2.start.y) / (line2.end.x - line2.start.x)
+  );
+  return Math.abs(k1 - k2) <= 0.1;
+}
+
+export function isPointOnLine(line: Line, point: Point): boolean {
+  return (
+    Math.abs(
+      distanceBetweenPoints(line.start, point) +
+        distanceBetweenPoints(line.end, point) -
+        distanceBetweenPoints(line.end, line.start)
+    ) <= 0.1
+  );
+}
+
 export function checkIntersection(line1: Line, line2: Line): Point | null {
   let checkedPoints = [line1.start, line1.end, line2.start, line2.end];
   let A: number, B: number, C: number;
@@ -143,22 +176,6 @@ export function checkIntersection(line1: Line, line2: Line): Point | null {
   if (isPointOnLine(line1, line2.end)) return line2.end;
 
   return TempCheck();
-
-  function isPointOnLine(l: Line, c: Point): boolean {
-    let p1 = l.start;
-    let p2 = l.end;
-
-    let dx1 = p2.x - p1.x;
-    let dy1 = p2.y - p1.y;
-
-    let dx = c.x - p1.x;
-    let dy = c.y - p1.y;
-
-    let S = dx1 * dy - dx * dy1;
-    let ab = Math.sqrt(dx1 * dx1 + dy1 * dy1);
-    let h = S / ab;
-    return Math.abs(h) < 0.1;
-  }
 
   function VEK(ax: number, ay: number, bx: number, by: number) {
     return ax * by - bx * ay;

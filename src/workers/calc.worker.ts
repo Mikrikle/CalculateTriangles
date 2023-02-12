@@ -1,4 +1,4 @@
-import { checkIntersection, linesToTriangle } from "../calculation";
+import { checkIntersection, isLinesPartsOfOneLine, linesToTriangle } from "../calculation";
 import {
   Line,
   Point,
@@ -17,9 +17,21 @@ class TrianglesCalculator {
 
   public calc(lines: Line[]) {
     this.lines = lines;
+    this.recalcLines();
     this.recalcIntersections();
     this.recalcConnections();
     this.recalcTriangles();
+  }
+
+  private recalcLines() {
+    for(let line1 of this.lines){
+      for(let line2 of this.lines){
+        if(line1 == line2) continue;
+        let line = isLinesPartsOfOneLine(line1, line2);
+        if(line && this.lines.findIndex((l)=>isLinesEqual(l, line)) === -1)
+          this.lines.push(line);
+      }
+    }
   }
 
   private recalcIntersections() {
@@ -34,6 +46,7 @@ class TrianglesCalculator {
       this.segmentsMap.get(this.lines.indexOf(line1))?.push(line1.start);
       this.segmentsMap.get(this.lines.indexOf(line1))?.push(line1.end);
       for (let line2 of this.lines) {
+        if(line1 == line2) continue;
         let intersectionPoint = checkIntersection(line1, line2);
         if (intersectionPoint != null) {
           this.segmentsMap
