@@ -16,6 +16,7 @@ const calculateworker = new Worker(
 );
 calculateworker.onmessage = (message) => {
   calculator = message.data;
+  console.log(calculator);
   if (trianglesCounter) {
     trianglesCounter.textContent = calculator.triangles.length;
   }
@@ -59,13 +60,15 @@ const outputCanvas = new OutputTriangleCanvas(
 
 function drawOutputCanvas() {
   outputCanvas.clearCanvas();
+  if(!calculator)
+    return;
   outputCanvas.drawLines(calculator.lines, "grey", 1);
   outputCanvas.drawPoints(calculator.points, "gray", 5);
   outputCanvas.drawTriangle(calculator.triangles[showTriangleIndex], "red", 4);
 }
 
 function drawTrianglesSelector() {
-  if (trianglesSelector && calculator.triangles.length > 0) {
+  if (trianglesSelector && calculator && calculator.triangles.length > 0) {
     trianglesSelector.textContent = `${showTriangleIndex + 1} / ${
       calculator.triangles.length
     }`;
@@ -73,6 +76,8 @@ function drawTrianglesSelector() {
 }
 
 document.getElementById("clear")?.addEventListener("click", () => {
+  showTriangleIndex = 0;
+  calculator = null;
   canvas.clearAll();
   outputCanvas.clearCanvas();
   if (trianglesSelector) {
@@ -84,12 +89,12 @@ document.getElementById("clear")?.addEventListener("click", () => {
 });
 
 document.getElementById("btn-prev")?.addEventListener("click", () => {
-  if (showTriangleIndex > 0) showTriangleIndex--;
+  if (calculator && showTriangleIndex > 0) showTriangleIndex--;
   drawOutputCanvas();
   drawTrianglesSelector();
 });
 document.getElementById("btn-next")?.addEventListener("click", () => {
-  if (showTriangleIndex < calculator.triangles.length - 1) showTriangleIndex++;
+  if (calculator && showTriangleIndex < calculator.triangles.length - 1) showTriangleIndex++;
   drawOutputCanvas();
   drawTrianglesSelector();
 });
