@@ -1,10 +1,10 @@
-import { Point, Line, Triangle, isPointsEqual } from "./core";
+import { Point, Line, Triangle, arePointsEqual } from "./core";
 
 export function linesToTriangle(l1: Line, l2: Line, l3: Line): Triangle | null {
   let hpoints = [l1.start, l1.end, l2.start, l2.end, l3.start, l3.end];
   hpoints = hpoints.filter(
     (value, index, self) =>
-      index === self.findIndex((p) => isPointsEqual(p, value))
+      index === self.findIndex((p) => arePointsEqual(p, value))
   );
   if (hpoints.length != 3) return null;
 
@@ -129,16 +129,16 @@ export function distanceFromPointToLine(
 export function isLinesPartsOfOneLine(line1: Line, line2: Line): Line | null {
   if (!isLinesParallel(line1, line2)) return null;
 
-  if (isPointsEqual(line1.start, line2.start))
+  if (arePointsEqual(line1.start, line2.start))
     return new Line(line1.end, line2.end);
 
-  if (isPointsEqual(line1.end, line2.end))
+  if (arePointsEqual(line1.end, line2.end))
     return new Line(line1.start, line2.start);
 
-  if (isPointsEqual(line1.start, line2.end))
+  if (arePointsEqual(line1.start, line2.end))
     return new Line(line1.end, line2.start);
 
-  if (isPointsEqual(line1.end, line2.start))
+  if (arePointsEqual(line1.end, line2.start))
     return new Line(line1.start, line2.end);
 
   return null;

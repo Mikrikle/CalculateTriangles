@@ -3,8 +3,8 @@ import {
   Line,
   Point,
   Triangle,
-  isLinesEqual,
-  isPointsEqual,
+  areLinesEqual,
+  arePointsEqual,
   isTrianglesEqual,
 } from "../core";
 
@@ -28,7 +28,7 @@ class TrianglesCalculator {
       for(let line2 of this.lines){
         if(line1 == line2) continue;
         let line = isLinesPartsOfOneLine(line1, line2);
-        if(line && this.lines.findIndex((l)=>isLinesEqual(l, line)) === -1)
+        if(line && this.lines.findIndex((l)=>areLinesEqual(l, line)) === -1)
           this.lines.push(line);
       }
     }
@@ -62,7 +62,7 @@ class TrianglesCalculator {
 
     this.points = this.points.filter(
       (value, index, self) =>
-        index === self.findIndex((p) => isPointsEqual(p, value))
+        index === self.findIndex((p) => arePointsEqual(p, value))
     );
   }
 
@@ -71,7 +71,7 @@ class TrianglesCalculator {
     for (let intersectionPoints of this.segmentsMap.values()) {
       for (let p1 of intersectionPoints) {
         for (let p2 of intersectionPoints) {
-          if (!isPointsEqual(p1, p2)) {
+          if (!arePointsEqual(p1, p2)) {
             this.connections.push(new Line(p1, p2));
           }
         }
@@ -80,7 +80,7 @@ class TrianglesCalculator {
 
     this.connections = this.connections.filter(
       (value, index, self) =>
-        index === self.findIndex((l) => isLinesEqual(l, value))
+        index === self.findIndex((l) => areLinesEqual(l, value))
     );
   }
 
