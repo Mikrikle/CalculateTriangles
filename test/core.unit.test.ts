@@ -54,7 +54,7 @@ class PointTests {
 @suite
 class LineTests {
   @test
-  "should return true for equal lines"() {
+  "areLinesEqual returns true for lines with identical points"() {
     // Arrange
     const p1 = new Point(0, 0);
     const p2 = new Point(1, 1);
@@ -69,7 +69,7 @@ class LineTests {
   }
 
   @test
-  "should return true for collinear lines"() {
+  "areLinesEqual returns true for collinear lines"() {
     // Arrange
     const p1 = new Point(0, 0);
     const p2 = new Point(1, 1);
@@ -87,7 +87,7 @@ class LineTests {
 @suite
 class TriangleTests {
   @test
-  "returns true for equal triangles"() {
+  "isTrianglesEqual returns true for triangles with identical points"() {
     const p1 = new Point(0, 0);
     const p2 = new Point(5, 0);
     const p3 = new Point(0, 5);
@@ -100,7 +100,7 @@ class TriangleTests {
   }
 
   @test
-  "returns false for non-equal triangles"() {
+  "isTrianglesEqual returns false for triangles with different points"() {
     const t1 = new Triangle(new Point(0, 0), new Point(5, 0), new Point(0, 5));
     const t2 = new Triangle(new Point(0, 0), new Point(5, 5), new Point(0, 5));
 
