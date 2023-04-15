@@ -163,10 +163,10 @@ export function distanceFromPointToLine(
 }
 
 /**
- *  Returns a line which contains the common parts of two lines if they are parts of one line
- *  @param line1 The first line
- *  @param line2 The second line
- *  @returns A new Line object that represents the common parts of the two input lines, or null if they are not parts of one line
+ *  Returns a line which contains the common parts of two lines if they are parts of one line.
+ *  @param line1 The first line.
+ *  @param line2 The second line.
+ *  @returns A new Line object that represents the common parts of the two input lines, or null if they are not parts of one line.
  */
 export function findCommonLine(line1: Line, line2: Line): Line | null {
   if (!areLinesParallel(line1, line2)) return null;
@@ -182,6 +182,18 @@ export function findCommonLine(line1: Line, line2: Line): Line | null {
 
   if (arePointsEqual(line1.end, line2.start))
     return new Line(line1.start, line2.end);
+
+  return null;
+}
+
+export function findCommonPoint(line1: Line, line2: Line): Point | null {
+  if (arePointsEqual(line1.start, line2.start)) return line1.start.clone();
+
+  if (arePointsEqual(line1.end, line2.end)) return line1.end.clone();
+
+  if (arePointsEqual(line1.start, line2.end)) return line1.start.clone();
+
+  if (arePointsEqual(line1.end, line2.start)) return line1.end.clone();
 
   return null;
 }
@@ -218,6 +230,12 @@ export function areLinesParallel(line1: Line, line2: Line): boolean {
   return Math.abs(k1 - k2) <= EPSILON;
 }
 
+/**
+ * Determines whether a point is located on a given line segment.
+ * @param line - The line segment to test.
+ * @param point - The point to check.
+ * @returns True if the point is on the line segment, false otherwise.
+ */
 export function isPointOnLine(line: Line, point: Point): boolean {
   return (
     Math.abs(
@@ -228,93 +246,51 @@ export function isPointOnLine(line: Line, point: Point): boolean {
   );
 }
 
-export function checkIntersection(line1: Line, line2: Line): Point | null {
-  let checkedPoints = [line1.start, line1.end, line2.start, line2.end];
-  let A: number, B: number, C: number;
-  let pointxx: number, pointyy: number;
-
-  if (isPointOnLine(line2, line1.start)) return line1.start;
-  if (isPointOnLine(line2, line1.end)) return line1.end;
-
-  if (isPointOnLine(line1, line2.start)) return line2.start;
-  if (isPointOnLine(line1, line2.end)) return line2.end;
-
-  return TempCheck();
-
-  function VEK(ax: number, ay: number, bx: number, by: number) {
-    return ax * by - bx * ay;
+/**
+ * Returns the point of intersection or connection between two line segments.
+ * @param line1 - The first line segment.
+ * @param line2 - The second line segment.
+ * @returns The point of intersection or connection between the two line segments, or null.
+ */
+export function findIntersectionPoint(line1: Line, line2: Line): Point | null {
+  // Check if the two line segments are parallel
+  if (areLinesParallel(line1, line2)) {
+    // If they are parallel, check if they lie on the same line
+    return findCommonPoint(line1, line2);
   }
 
-  function CrossingCheck(p1: Point, p2: Point, p3: Point, p4: Point) {
-    let v1, v2, v3, v4;
+  // Calculate the slopes of the lines
+  const slope1 = (line1.end.y - line1.start.y) / (line1.end.x - line1.start.x);
+  const slope2 = (line2.end.y - line2.start.y) / (line2.end.x - line2.start.x);
 
-    v1 = VEK(p4.x - p3.x, p4.y - p3.y, p1.x - p3.x, p1.y - p3.y);
-    v2 = VEK(p4.x - p3.x, p4.y - p3.y, p2.x - p3.x, p2.y - p3.y);
-    v3 = VEK(p2.x - p1.x, p2.y - p1.y, p3.x - p1.x, p3.y - p1.y);
-    v4 = VEK(p2.x - p1.x, p2.y - p1.y, p4.x - p1.x, p4.y - p1.y);
-    if (v1 * v2 < 0 && v3 * v4 < 0) return true;
-    else return false;
+  // Calculate the y-intercepts of the lines
+  const yIntercept1 = line1.start.y - slope1 * line1.start.x;
+  const yIntercept2 = line2.start.y - slope2 * line2.start.x;
+
+  // Check if either slope is vertical (i.e. infinite)
+  if (!isFinite(slope1)) {
+    return new Point(line1.start.x, slope2 * line1.start.x + yIntercept2);
+  }
+  if (!isFinite(slope2)) {
+    return new Point(line2.start.x, slope1 * line2.start.x + yIntercept1);
   }
 
-  function EquationOfTheLine(p1: Point, p2: Point) {
-    A = p2.y - p1.y;
-    B = p1.x - p2.x;
-    C = -p1.x * (p2.y - p1.y) + p1.y * (p2.x - p1.x);
-  }
+  // Calculate the x-coordinate of the intersection point
+  const x = (yIntercept2 - yIntercept1) / (slope1 - slope2);
 
-  function IntersectionX(
-    a1: number,
-    b1: number,
-    c1: number,
-    a2: number,
-    b2: number,
-    c2: number
+  // Check if the x-coordinate is out of range for both line segments
+  if (
+    x < Math.min(line1.start.x, line1.end.x) - EPSILON ||
+    x > Math.max(line1.start.x, line1.end.x) + EPSILON ||
+    x < Math.min(line2.start.x, line2.end.x) - EPSILON ||
+    x > Math.max(line2.start.x, line2.end.x) + EPSILON
   ) {
-    let d, dx, pointx;
-    d = a1 * b2 - b1 * a2;
-    dx = -c1 * b2 + b1 * c2;
-    pointx = dx / d;
-    return pointx;
+    return null;
   }
 
-  function IntersectionY(
-    a1: number,
-    b1: number,
-    c1: number,
-    a2: number,
-    b2: number,
-    c2: number
-  ) {
-    let d, dy, pointy;
-    d = a1 * b2 - b1 * a2;
-    dy = -a1 * c2 + c1 * a2;
-    pointy = dy / d;
-    return pointy;
-  }
+  // Calculate the y-coordinate of the intersection point
+  const y = slope1 * x + yIntercept1;
 
-  function TempCheck(): Point | null {
-    if (
-      CrossingCheck(
-        checkedPoints[0],
-        checkedPoints[1],
-        checkedPoints[2],
-        checkedPoints[3]
-      )
-    ) {
-      let a1, b1, c1, a2, b2, c2;
-      EquationOfTheLine(checkedPoints[0], checkedPoints[1]);
-      a1 = A;
-      b1 = B;
-      c1 = C;
-      EquationOfTheLine(checkedPoints[2], checkedPoints[3]);
-      a2 = A;
-      b2 = B;
-      c2 = C;
-      pointxx = IntersectionX(a1, b1, c1, a2, b2, c2);
-      pointyy = IntersectionY(a1, b1, c1, a2, b2, c2);
-      return new Point(pointxx, pointyy);
-    } else {
-      return null;
-    }
-  }
+  // Return the intersection point
+  return new Point(x, y);
 }

@@ -1,4 +1,4 @@
-import { checkIntersection, findCommonLine, createTriangleFromLines } from "./coremath";
+import { findIntersectionPoint, findCommonLine, createTriangleFromLines } from "./coremath";
 import {
   Line,
   Point,
@@ -47,7 +47,7 @@ export class TrianglesCalculator {
       this.segmentsMap.get(this.lines.indexOf(line1))?.push(line1.end);
       for (let line2 of this.lines) {
         if(line1 == line2) continue;
-        let intersectionPoint = checkIntersection(line1, line2);
+        let intersectionPoint = findIntersectionPoint(line1, line2);
         if (intersectionPoint != null) {
           this.segmentsMap
             .get(this.lines.indexOf(line1))

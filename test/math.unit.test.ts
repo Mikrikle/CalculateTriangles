@@ -1,5 +1,5 @@
 import {
-  checkIntersection,
+  findIntersectionPoint,
   findCommonLine,
   createTriangleFromLines,
   distanceBetweenPoints,
@@ -120,6 +120,19 @@ class CalculationTests {
     expect(areLinesParallel(line3, line2)).to.be.true;
   }
 
+
+  @test
+  public "areLinesParallel should return true for parallel lines on Y"(): void {
+    const line1 = new Line(new Point(4, 4), new Point(6, 4));
+    const line2 = new Line(new Point(9, 4), new Point(6, 4));
+    const line3 = new Line(new Point(4, 4), new Point(-8, 4));
+
+    expect(areLinesParallel(line1, line2)).to.be.true;
+    expect(areLinesParallel(line2, line1)).to.be.true;
+    expect(areLinesParallel(line1, line3)).to.be.true;
+    expect(areLinesParallel(line3, line2)).to.be.true;
+  }
+
   @test
   public "findCommonLine shold return true if two segments are parts of one line"(): void {
     const line1 = new Line(new Point(-4, -4), new Point(2, 2));
@@ -130,4 +143,33 @@ class CalculationTests {
     expect(arePointsEqual(line1.start, result.start)).to.be.true;
     expect(arePointsEqual(line2.end, result.end)).to.be.true;
   }
+
+
+  @test
+  public "findIntersectionPoint shold find correct intersection point"():void {
+    const line1 = new Line(new Point(0, 0), new Point(0, 10));
+    const line2 = new Line(new Point(5, 5), new Point(0, 5));
+    const line3 = new Line(new Point(0, 5), new Point(5, 5));
+
+    const result12 = findIntersectionPoint(line1, line2);
+    const result13 = findIntersectionPoint(line1, line3);
+
+    expect(result12).not.null;
+    expect(result13).not.null;
+    expect(result12.x).to.be.closeTo(0, this.tolerance);
+    expect(result12.y).to.be.closeTo(5, this.tolerance);
+  }
+
+  @test
+  public "findIntersectionPoint shold find correct intersection point for segments of the same line"():void {
+    const line1 = new Line(new Point(0, 0), new Point(0, 10));
+    const line2 = new Line(new Point(0, 10), new Point(0, 20));
+
+    const result = findIntersectionPoint(line1, line2);
+
+    expect(result).not.null;
+    expect(result.x).to.be.closeTo(0, this.tolerance);
+    expect(result.y).to.be.closeTo(10, this.tolerance);
+  }
+
 }

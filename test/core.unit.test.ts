@@ -38,13 +38,10 @@ class PointTests {
 
   @test
   public "clone method should return a new point with the same coordinates"(): void {
-    // Arrange
     const originalPoint = new Point(1, 2);
 
-    // Act
     const clonedPoint = originalPoint.clone();
 
-    // Assert
     expect(clonedPoint).to.not.equal(originalPoint);
     expect(clonedPoint.x).to.equal(originalPoint.x);
     expect(clonedPoint.y).to.equal(originalPoint.y);
@@ -55,31 +52,25 @@ class PointTests {
 class LineTests {
   @test
   "areLinesEqual returns true for lines with identical points"() {
-    // Arrange
     const p1 = new Point(0, 0);
     const p2 = new Point(1, 1);
     const lineA = new Line(p1, p2);
     const lineB = new Line(p1.clone(), p2.clone()); // clone to get a new reference
 
-    // Act
     const result = areLinesEqual(lineA, lineB);
 
-    // Assert
     expect(result).to.be.true;
   }
 
   @test
   "areLinesEqual returns true for collinear lines"() {
-    // Arrange
     const p1 = new Point(0, 0);
     const p2 = new Point(1, 1);
     const lineA = new Line(p1, p2);
     const lineB = new Line(p2, p1);
 
-    // Act
     const result = areLinesEqual(lineA, lineB);
 
-    // Assert
     expect(result).to.be.true;
   }
 }
