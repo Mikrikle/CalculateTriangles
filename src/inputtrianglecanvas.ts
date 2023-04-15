@@ -7,7 +7,7 @@ import {
   mergePointWithLine,
   mergePointWithLinePoints,
   mergePointWithPoint,
-} from "./calculation";
+} from "./coremath";
 
 export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
   public mergeRadius: number = 50;

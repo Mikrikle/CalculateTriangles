@@ -1,21 +1,41 @@
-import { Point, Line, Triangle, arePointsEqual } from "./core";
+import { Point, Line, Triangle, arePointsEqual, EPSILON } from "./core";
 
-export function linesToTriangle(l1: Line, l2: Line, l3: Line): Triangle | null {
-  let hpoints = [l1.start, l1.end, l2.start, l2.end, l3.start, l3.end];
+/**
+ * Creates a triangle from three lines.
+ * @param line1 - The first line of the triangle.
+ * @param line2 - The second line of the triangle.
+ * @param line3 - The third line of the triangle.
+ * @returns The triangle created from the given lines, or null if the lines cannot form a valid triangle.
+ */
+export function createTriangleFromLines(
+  line1: Line,
+  line2: Line,
+  line3: Line
+): Triangle | null {
+  let hpoints = [
+    line1.start,
+    line1.end,
+    line2.start,
+    line2.end,
+    line3.start,
+    line3.end,
+  ];
   hpoints = hpoints.filter(
     (value, index, self) =>
       index === self.findIndex((p) => arePointsEqual(p, value))
   );
+  // The triangle must consist strictly of three unique points
   if (hpoints.length != 3) return null;
 
-  var a = distanceBetweenPoints(l1.start, l1.end);
-  var b = distanceBetweenPoints(l2.start, l2.end);
-  var c = distanceBetweenPoints(l3.start, l3.end);
-
+  // Checking for the possibility of the existence of a triangle
+  var a = distanceBetweenPoints(line1.start, line1.end);
+  var b = distanceBetweenPoints(line2.start, line2.end);
+  var c = distanceBetweenPoints(line3.start, line3.end);
   if (a > b + c || b > a + c || c > a + b) return null;
   const p = (a + b + c) / 2;
-  let S = (p * (p - a) * (p - b) * (p - c)) ** 0.5;
-  if (isNaN(S) || Math.abs(S) <= 1) return null;
+  let S = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+  if (isNaN(S) || S <= 1) return null;
+
   return new Triangle(hpoints[0], hpoints[1], hpoints[2]);
 }
 
@@ -74,9 +94,9 @@ export function mergePointWithLine(
   let minDist: number = Number.MAX_SAFE_INTEGER;
   for (let line of lines) {
     let pd = distanceFromPointToLine(point, line);
-    if (pd.distace < minDist) {
-      minDist = pd.distace;
-      minPoint = pd.point;
+    if (pd.distance < minDist) {
+      minDist = pd.distance;
+      minPoint = pd.nearestPoint;
     }
   }
   if (minPoint != null && minDist <= raduis) {
@@ -87,47 +107,69 @@ export function mergePointWithLine(
   return false;
 }
 
-export function distanceBetweenPoints(p1: Point, p2: Point): number {
-  return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+/**
+ * Calculates the distance between two points.
+ * @param pointA - The first point
+ * @param pointB - The second point
+ * @returns The distance between the two points
+ */
+export function distanceBetweenPoints(pointA: Point, pointB: Point): number {
+  return Math.sqrt((pointA.x - pointB.x) ** 2 + (pointA.y - pointB.y) ** 2);
 }
 
+/**
+ * Calculates the distance between a point and a line, and finds the nearest point on the line to the given point.
+ * @param point - The point to find the distance to the line from.
+ * @param line - The line to find the distance to the point from.
+ * @returns The nearest point on the line to the given point and the distance between the given point and the line.
+ */
 export function distanceFromPointToLine(
   point: Point,
   line: Line
-): { point: Point; distace: number } {
-  const A = point.x - line.start.x;
-  const B = point.y - line.start.y;
-  const C = line.end.x - line.start.x;
-  const D = line.end.y - line.start.y;
+): { nearestPoint: Point; distance: number } {
+  const { start, end } = line;
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
 
-  let dot = A * C + B * D;
-  let len_sq = C * C + D * D;
-  let param = -1;
-  if (len_sq != 0) {
-    param = dot / len_sq;
-  }
-  let xx = 0;
-  let yy = 0;
-
-  if (param < 0) {
-    xx = line.start.x;
-    yy = line.start.y;
-  } else if (param > 1) {
-    xx = line.end.x;
-    yy = line.end.y;
-  } else {
-    xx = line.start.x + param * C;
-    yy = line.start.y + param * D;
+  // If the line is just a point, return distance to that point
+  if (dx === 0 && dy === 0) {
+    return {
+      distance: distanceBetweenPoints(point, start),
+      nearestPoint: start,
+    };
   }
 
-  let dx = point.x - xx;
-  let dy = point.y - yy;
+  // Calculate the parameter of the projection of the point onto the line
+  const t =
+    ((point.x - start.x) * dx + (point.y - start.y) * dy) / (dx * dx + dy * dy);
 
-  return { point: new Point(xx, yy), distace: Math.sqrt(dx * dx + dy * dy) };
+  // If t is outside the range [0, 1], then the nearest point is one of the line endpoints
+  if (t < 0) {
+    return {
+      distance: distanceBetweenPoints(point, start),
+      nearestPoint: start,
+    };
+  } else if (t > 1) {
+    return {
+      distance: distanceBetweenPoints(point, end),
+      nearestPoint: end,
+    };
+  }
+
+  // Calculate the nearest point on the line and return its distance to the point
+  const nearestPoint = new Point(start.x + t * dx, start.y + t * dy);
+  const distance = distanceBetweenPoints(point, nearestPoint);
+  return { distance, nearestPoint };
 }
 
-export function isLinesPartsOfOneLine(line1: Line, line2: Line): Line | null {
-  if (!isLinesParallel(line1, line2)) return null;
+/**
+ *  Returns a line which contains the common parts of two lines if they are parts of one line
+ *  @param line1 The first line
+ *  @param line2 The second line
+ *  @returns A new Line object that represents the common parts of the two input lines, or null if they are not parts of one line
+ */
+export function findCommonLine(line1: Line, line2: Line): Line | null {
+  if (!areLinesParallel(line1, line2)) return null;
 
   if (arePointsEqual(line1.start, line2.start))
     return new Line(line1.end, line2.end);
@@ -144,14 +186,36 @@ export function isLinesPartsOfOneLine(line1: Line, line2: Line): Line | null {
   return null;
 }
 
-export function isLinesParallel(line1: Line, line2: Line): boolean {
+/**
+ * Checks if two lines are parallel.
+ *
+ * @param line1 The first line.
+ * @param line2 The second line.
+ *
+ * @returns True if the lines are parallel, false otherwise.
+ */
+export function areLinesParallel(line1: Line, line2: Line): boolean {
+  if (
+    Math.abs(line1.start.y - line1.end.y) <= EPSILON &&
+    Math.abs(line2.start.y - line2.end.y) <= EPSILON
+  ) {
+    return true;
+  }
+
+  if (
+    Math.abs(line1.start.x - line1.end.x) <= EPSILON &&
+    Math.abs(line2.start.x - line2.end.x) <= EPSILON
+  ) {
+    return true;
+  }
+
   let k1 = Math.atan(
     (line1.end.y - line1.start.y) / (line1.end.x - line1.start.x)
   );
   let k2 = Math.atan(
     (line2.end.y - line2.start.y) / (line2.end.x - line2.start.x)
   );
-  return Math.abs(k1 - k2) <= 0.1;
+  return Math.abs(k1 - k2) <= EPSILON;
 }
 
 export function isPointOnLine(line: Line, point: Point): boolean {
@@ -160,7 +224,7 @@ export function isPointOnLine(line: Line, point: Point): boolean {
       distanceBetweenPoints(line.start, point) +
         distanceBetweenPoints(line.end, point) -
         distanceBetweenPoints(line.end, line.start)
-    ) <= 0.1
+    ) <= EPSILON
   );
 }
 
