@@ -10,7 +10,7 @@ self.onmessage = (message: MessageEvent<Line[]>) => {
     result: calculator.triangles.length,
     lines: calculator.lines,
     points: calculator.points,
-    connections: calculator.connections,
+    connections: calculator.segments,
     triangles: calculator.triangles
   });
 };

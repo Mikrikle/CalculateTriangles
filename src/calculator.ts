@@ -1,4 +1,8 @@
-import { findIntersectionPoint, findCommonLine, createTriangleFromLines } from "./coremath";
+import {
+  findIntersectionPoint,
+  findCommonLine,
+  createTriangleFromLines,
+} from "./coremath";
 import {
   Line,
   Point,
@@ -9,97 +13,125 @@ import {
 } from "./core";
 
 export class TrianglesCalculator {
+  /**
+   * An array of Point objects representing all the points.
+   */
   points: Point[] = [];
+
+  /**
+   * An array of Line objects representing all the lines in the diagram.
+   */
   lines: Line[] = [];
-  connections: Line[] = [];
+
+  /**
+   * An array of Line objects representing all the line segments, including those that make up the triangles.
+   */
+  segments: Line[] = [];
+
+  /**
+   * An array of Triangle objects representing all the triangles.
+   */
   triangles: Triangle[] = [];
+
+  /**
+   * Each key in the segments map represents a line index, and its value is an array of points that belong to that line
+   * The points array contains all the distinct intersection points between the lines, as well as the start and end points of each line.
+   */
   segmentsMap: Map<number, Point[]> = new Map<number, Point[]>();
 
   public calc(lines: Line[]) {
     this.lines = lines;
-    this.recalcLines();
-    this.recalcIntersections();
-    this.recalcConnections();
-    this.recalcTriangles();
+    this.calcLines();
+    this.calcIntersections();
+    this.calcSegments();
+    this.calcTriangles();
   }
 
-  private recalcLines() {
-    for(let line1 of this.lines){
-      for(let line2 of this.lines){
-        if(line1 == line2) continue;
-        let line = findCommonLine(line1, line2);
-        if(line && this.lines.findIndex((l)=>areLinesEqual(l, line)) === -1)
+  /**
+   * Calculates the lines array, finding all the unique lines that can be formed
+   * and adds to the array.
+   */
+  private calcLines() {
+    const nLines = this.lines.length;
+    for (let i = 0; i < nLines - 1; i++) {
+      for (let j = i + 1; j < nLines; j++) {
+        const line = findCommonLine(this.lines[i], this.lines[j]);
+        if (line && !this.lines.some((l) => areLinesEqual(l, line))) {
           this.lines.push(line);
+        }
       }
     }
   }
 
-  private recalcIntersections() {
+  /**
+   * Calculates the intersections of the lines and updates the segments map.
+   */
+  private calcIntersections() {
     this.segmentsMap = new Map<number, Point[]>();
     for (let i = 0; i < this.lines.length; i++) {
       this.segmentsMap.set(i, []);
     }
     this.points = [];
-    for (let line1 of this.lines) {
-      this.points.push(line1.start);
-      this.points.push(line1.end);
-      this.segmentsMap.get(this.lines.indexOf(line1))?.push(line1.start);
-      this.segmentsMap.get(this.lines.indexOf(line1))?.push(line1.end);
-      for (let line2 of this.lines) {
-        if(line1 == line2) continue;
-        let intersectionPoint = findIntersectionPoint(line1, line2);
+    for (let i = 0; i < this.lines.length - 1; i++) {
+      for (let j = i + 1; j < this.lines.length; j++) {
+        const intersectionPoint = findIntersectionPoint(
+          this.lines[i],
+          this.lines[j]
+        );
         if (intersectionPoint != null) {
-          this.segmentsMap
-            .get(this.lines.indexOf(line1))
-            ?.push(intersectionPoint);
-          this.segmentsMap
-            .get(this.lines.indexOf(line2))
-            ?.push(intersectionPoint);
-          this.points.push(intersectionPoint);
+          if (!this.points.some((p) => arePointsEqual(p, intersectionPoint))) {
+            this.points.push(intersectionPoint);
+          }
+          this.segmentsMap.get(i)?.push(intersectionPoint);
+          this.segmentsMap.get(j)?.push(intersectionPoint);
         }
       }
+      this.points.push(this.lines[i].start);
+      this.points.push(this.lines[i].end);
+      this.segmentsMap.get(i)?.push(this.lines[i].start);
+      this.segmentsMap.get(i)?.push(this.lines[i].end);
     }
-
-    this.points = this.points.filter(
-      (value, index, self) =>
-        index === self.findIndex((p) => arePointsEqual(p, value))
-    );
   }
 
-  private recalcConnections() {
-    this.connections = [];
+  /**
+   * Calculates the connections between the intersection points of the lines
+   * and stores them in the segments property.
+   */
+  private calcSegments() {
+    this.segments = [];
     for (let intersectionPoints of this.segmentsMap.values()) {
-      for (let p1 of intersectionPoints) {
-        for (let p2 of intersectionPoints) {
+      for (let i = 0; i < intersectionPoints.length - 1; i++) {
+        for (let j = i + 1; j < intersectionPoints.length; j++) {
+          const p1 = intersectionPoints[i];
+          const p2 = intersectionPoints[j];
           if (!arePointsEqual(p1, p2)) {
-            this.connections.push(new Line(p1, p2));
+            const line = new Line(p1, p2);
+            if (!this.segments.some((l) => areLinesEqual(l, line)))
+              this.segments.push(new Line(p1, p2));
           }
         }
       }
     }
-
-    this.connections = this.connections.filter(
-      (value, index, self) =>
-        index === self.findIndex((l) => areLinesEqual(l, value))
-    );
   }
 
-  private recalcTriangles() {
+  /**
+   * Calculates the triangles in the current state.
+   */
+  private calcTriangles() {
     this.triangles = [];
-    for (let l1 of this.connections) {
-      for (let l2 of this.connections) {
-        for (let l3 of this.connections) {
-          if (l1 == l2 || l1 == l3 || l2 == l3) continue;
-          let triangle = createTriangleFromLines(l1, l2, l3);
+    const nConnections = this.segments.length;
+    for (let i = 0; i < nConnections - 1; i++) {
+      const l1 = this.segments[i];
+      for (let j = i + 1; j < nConnections; j++) {
+        const l2 = this.segments[j];
+        for (let k = j + 1; k < nConnections; k++) {
+          const l3 = this.segments[k];
+          const triangle = createTriangleFromLines(l1, l2, l3);
           if (triangle != null) {
             this.triangles.push(triangle);
           }
         }
       }
     }
-    this.triangles = this.triangles.filter(
-      (value, index, self) =>
-        index === self.findIndex((t) => isTrianglesEqual(t, value))
-    );
   }
 }
