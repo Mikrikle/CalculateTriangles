@@ -5,6 +5,7 @@ import {
   distanceBetweenPoints,
   distanceFromPointToLine,
   areLinesParallel,
+  isPointOnLine,
 } from "../src/coremath";
 import { Point, Line, Triangle, arePointsEqual } from "../src/core";
 import { suite, test } from "@testdeck/mocha";
@@ -20,24 +21,35 @@ class CalculationTests {
 
   @test
   "distanceBetweenPoints returns the correct distance for points with positive coordinates"() {
-    const p1 = new Point(0, 0);
-    const p2 = new Point(3, 4);
+    const point1 = new Point(0, 0);
+    const point2 = new Point(3, 4);
     const expectedDistance = 5;
 
-    const distance = distanceBetweenPoints(p1, p2);
+    const distance = distanceBetweenPoints(point1, point2);
 
     distance.should.equal(expectedDistance);
   }
 
   @test
   "distanceBetweenPoints returns the correct distance for points with negative coordinates"() {
-    const p1 = new Point(-2, -2);
-    const p2 = new Point(-5, -6);
+    const point1 = new Point(-2, -2);
+    const point2 = new Point(-5, -6);
     const expectedDistance = 5;
 
-    const distance = distanceBetweenPoints(p1, p2);
+    const distance = distanceBetweenPoints(point1, point2);
 
     distance.should.equal(expectedDistance);
+  }
+
+  @test
+  "isPointOnLine returns false if the point is not on a line"() {
+    const point = new Point(100, 10);
+    const line = new Line(new Point(10, 10), new Point(50, 10));
+    const expectedDistance = 0;
+
+    const result = isPointOnLine(line, point);
+
+    expect(result).is.false;
   }
 
   @test
@@ -144,9 +156,8 @@ class CalculationTests {
     expect(arePointsEqual(line2.end, result.end)).to.be.true;
   }
 
-
   @test
-  public "findIntersectionPoint shold find correct intersection point"():void {
+  public "findIntersectionPoint shold return correct intersection point"():void {
     const line1 = new Line(new Point(0, 0), new Point(0, 10));
     const line2 = new Line(new Point(5, 5), new Point(0, 5));
     const line3 = new Line(new Point(0, 5), new Point(5, 5));
@@ -158,6 +169,16 @@ class CalculationTests {
     expect(result13).not.null;
     expect(result12.x).to.be.closeTo(0, this.tolerance);
     expect(result12.y).to.be.closeTo(5, this.tolerance);
+  }
+
+  @test
+  public "findIntersectionPoint shold return null fot lines that do not intersect"():void {
+    const line1 = new Line(new Point(10, 10), new Point(20, 10));
+    const line2 = new Line(new Point(100, 50), new Point(100, 30));
+
+    const result = findIntersectionPoint(line1, line2);
+    
+    expect(result).is.null;
   }
 
   @test

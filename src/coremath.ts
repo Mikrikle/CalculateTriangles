@@ -187,13 +187,10 @@ export function findCommonLine(line1: Line, line2: Line): Line | null {
 }
 
 export function findCommonPoint(line1: Line, line2: Line): Point | null {
-  if (arePointsEqual(line1.start, line2.start)) return line1.start.clone();
-
-  if (arePointsEqual(line1.end, line2.end)) return line1.end.clone();
-
-  if (arePointsEqual(line1.start, line2.end)) return line1.start.clone();
-
-  if (arePointsEqual(line1.end, line2.start)) return line1.end.clone();
+  if (arePointsEqual(line1.start, line2.start)) return line1.start;
+  if (arePointsEqual(line1.end, line2.end)) return line1.end;
+  if (arePointsEqual(line1.start, line2.end)) return line1.start;
+  if (arePointsEqual(line1.end, line2.start)) return line1.end;
 
   return null;
 }
@@ -208,15 +205,15 @@ export function findCommonPoint(line1: Line, line2: Line): Point | null {
  */
 export function areLinesParallel(line1: Line, line2: Line): boolean {
   if (
-    Math.abs(line1.start.y - line1.end.y) <= EPSILON &&
-    Math.abs(line2.start.y - line2.end.y) <= EPSILON
+    Math.abs(line1.start.y - line1.end.y) <= Number.EPSILON &&
+    Math.abs(line2.start.y - line2.end.y) <= Number.EPSILON
   ) {
     return true;
   }
 
   if (
-    Math.abs(line1.start.x - line1.end.x) <= EPSILON &&
-    Math.abs(line2.start.x - line2.end.x) <= EPSILON
+    Math.abs(line1.start.x - line1.end.x) <= Number.EPSILON &&
+    Math.abs(line2.start.x - line2.end.x) <= Number.EPSILON
   ) {
     return true;
   }
@@ -227,7 +224,7 @@ export function areLinesParallel(line1: Line, line2: Line): boolean {
   let k2 = Math.atan(
     (line2.end.y - line2.start.y) / (line2.end.x - line2.start.x)
   );
-  return Math.abs(k1 - k2) <= EPSILON;
+  return Math.abs(k1 - k2) <= Number.EPSILON;
 }
 
 /**
@@ -267,29 +264,25 @@ export function findIntersectionPoint(line1: Line, line2: Line): Point | null {
   const yIntercept1 = line1.start.y - slope1 * line1.start.x;
   const yIntercept2 = line2.start.y - slope2 * line2.start.x;
 
+  // Calculate the x-coordinate of the intersection point
+  let x = (yIntercept2 - yIntercept1) / (slope1 - slope2);
+  // Calculate the y-coordinate of the intersection point
+  let y = slope1 * x + yIntercept1;
+
   // Check if either slope is vertical (i.e. infinite)
   if (!isFinite(slope1)) {
-    return new Point(line1.start.x, slope2 * line1.start.x + yIntercept2);
+    x = line1.start.x;
+    y = slope2 * line1.start.x + yIntercept2;
   }
   if (!isFinite(slope2)) {
-    return new Point(line2.start.x, slope1 * line2.start.x + yIntercept1);
+    x = line2.start.x;
+    y = slope1 * line2.start.x + yIntercept1;
   }
 
-  // Calculate the x-coordinate of the intersection point
-  const x = (yIntercept2 - yIntercept1) / (slope1 - slope2);
-
-  // Check if the x-coordinate is out of range for both line segments
-  if (
-    x < Math.min(line1.start.x, line1.end.x) - EPSILON ||
-    x > Math.max(line1.start.x, line1.end.x) + EPSILON ||
-    x < Math.min(line2.start.x, line2.end.x) - EPSILON ||
-    x > Math.max(line2.start.x, line2.end.x) + EPSILON
-  ) {
+  const point = new Point(x, y);
+  if (!isPointOnLine(line1, point) || !isPointOnLine(line2, point)) {
     return null;
   }
-
-  // Calculate the y-coordinate of the intersection point
-  const y = slope1 * x + yIntercept1;
 
   // Return the intersection point
   return new Point(x, y);
