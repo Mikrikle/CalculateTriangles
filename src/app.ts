@@ -35,7 +35,7 @@ const canvas = new InputTriangleCanvas(
     lineWidth: 2,
     pointSize: 8,
     canvasId: "canvas",
-    mergeRadius: 25,
+    mergeRadius: 20,
     useGrid: true,
     gridCellSize: 40,
     gridLineWidth: 20,

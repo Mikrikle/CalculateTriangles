@@ -1,13 +1,13 @@
 import { Point, Line, Triangle } from "./core";
 import { TriangleCanvas, TriangleCanvasConfig } from "./trianglecanvas";
 import {
-  checkIntersection,
+  findIntersectionPoint,
   distanceBetweenPoints,
   distanceFromPointToLine,
   mergePointWithLine,
   mergePointWithLinePoints,
   mergePointWithPoint,
-} from "./calculation";
+} from "./coremath";
 
 export class InputTriangleCanvasConfig extends TriangleCanvasConfig {
   public mergeRadius: number = 50;
@@ -104,7 +104,7 @@ export class InputTriangleCanvas extends TriangleCanvas {
   private addIntersectionPoint(line: Line) {
     let points: Point[] = [];
     for (let withLine of this.lines) {
-      let point = checkIntersection(line, withLine);
+      let point = findIntersectionPoint(line, withLine);
       if (point != null) points.push(point);
     }
     if (points.length > 0) {
